@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tomcat 9.0.73" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.73" ALTERNATIVE_JRE_ENABLED="false">
+  <configuration default="false" name="Tomcat 9.0.73" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" activateToolWindowBeforeRun="false" APPLICATION_SERVER_NAME="Tomcat 9.0.73" ALTERNATIVE_JRE_ENABLED="false">
     <deployment>
       <artifact name="Playlist:war exploded">
         <settings>
-          <option name="CONTEXT_PATH" value="/Playlist" />
+          <option name="CONTEXT_PATH" value="/PlaylistJS" />
         </settings>
       </artifact>
     </deployment>
@@ -80,7 +80,6 @@
       </SHUTDOWN>
     </ConfigurationWrapper>
     <method v="2">
-      <option name="Make" enabled="true" />
       <option name="BuildArtifacts" enabled="true">
         <artifact name="Playlist:war exploded" />
       </option>
