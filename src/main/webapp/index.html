@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Login page</title>
+<link rel="stylesheet" type="text/css" media="all" href="css/app.css"/>
+	<script src = "login.js" charset="utf-8" defer></script>
+	<script src = "utils.js" charset="utf-8" defer></script>
+</head>
+<body>
+	<h1>Welcome to the Playlist website</h1>
+	<fieldset>
+	<form class="indexForm" action="#">
+		<div class="formPrompt">Login using the form below:</div>
+		<label for = "username"> username </label>
+		<input type="text" name="username" id = "username" placeholder="Username" required>
+
+		<label for = "password">password</label>
+		<input type="password" name="password" id = "password" placeholder="Password" required>
+
+		<input id="loginButton" type="button" value="Login">
+
+		<div class="error" id = "error"></div>
+	</form>
+	</fieldset>
+</body>
+</html>
