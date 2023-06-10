@@ -14,7 +14,7 @@
     /**
      * It contains all the song titles and ids of the current playList needed for the sorting
      */
-    function PlayListSongsToOrder(){
+    function PlayListSongsToOrder() {
         /**
          * It's the id of the playList
          */
@@ -22,12 +22,12 @@
         /**
          * It's an array that contains song element. This attribute will be used to fill the table for the reorder
          */
-        this.songs = new Array();
+        this.songs = [];
 
         /**
          * Function used to reset the attribute songs
          */
-        this.reset = function() {
+        this.reset = function () {
             this.songs = [];
         }
 
@@ -35,7 +35,7 @@
          * Function that add a song to the attribute
          * @param song is the song to add
          */
-        this.addSong = function(song) {
+        this.addSong = function (song) {
             this.songs.push(song);
         }
     }
@@ -43,51 +43,51 @@
     /**
      * Function that represent a song to be sorted
      */
-    function Song(id , title){
+    function Song(id, title) {
         this.id = id;
         this.title = title;
     }
 
-    window.addEventListener("load" , () => {
-        if(sessionStorage.getItem("user") == null){
+    window.addEventListener("load", () => {
+        if (sessionStorage.getItem("user") == null) {
             window.location.href = "login.html";
-        }else{
+        } else {
             pageOrchestrator.start();
             pageOrchestrator.refresh();
         }
-    } , false);
+    }, false);
 
     /**
      * Function that initialize the personal message (the userName)
      * @param username is the userName to add in the HTML file
      * @param messageContainer is the place where add the userName
      */
-    function PersonalMessage(userName , messageContainer) {
+    function PersonalMessage(userName, messageContainer) {
         this.username = userName;
         this.messageContainer = messageContainer;
 
-        this.show = function() {
+        this.show = function () {
             this.messageContainer.textContent = this.username;
         }
     }
 
-    function HandleButtons(before , next) {
+    function HandleButtons(before, next) {
         this.before = before;
         this.next = next;
 
-        this.showBefore = function() {
+        this.showBefore = function () {
             this.before.style.display = "";
         }
 
-        this.hideBefore = function() {
+        this.hideBefore = function () {
             this.before.style.display = "none";
         }
 
-        this.showNext = function() {
+        this.showNext = function () {
             this.next.style.display = "";
         }
 
-        this.hideNext = function() {
+        this.hideNext = function () {
             this.next.style.display = "none";
         }
     }
@@ -97,21 +97,21 @@
      * @param playlistName is the name of the playlist
      * @param messageContainer id the tag where put the name of the playlist
      */
-    function PlaylistMessage(messageContainer){
+    function PlaylistMessage(messageContainer) {
         this.playlistName = null;
         this.messageContainer = messageContainer;
 
-        this.show = function() {
+        this.show = function () {
             this.messageContainer.textContent = "PlayList: " + this.playlistName;
             this.messageContainer.style.display = "";
         }
 
-        this.setPlayListName = function(playlistName) {
+        this.setPlayListName = function (playlistName) {
             this.playlistName = playlistName;
             this.show();
         }
 
-        this.reset = function() {
+        this.reset = function () {
             this.messageContainer.style.display = "none";
         }
     }
@@ -123,38 +123,38 @@
      * @param listBodyContainer is the body of the table
      * @constructor
      */
-    function PlaylistList(alertContainer , listContainer , listBodyContainer) {
+    function PlaylistList(alertContainer, listContainer, listBodyContainer) {
         this.alertContainer = alertContainer;
         this.listContainer = listContainer;
         this.listBodyContainer = listBodyContainer;
 
         let self = this;
 
-        this.reset = function() {
+        this.reset = function () {
             this.listContainer.style.disply = "none";
             this.alertContainer.textContent = "";
         }
 
-        this.setVisible = function() {
+        this.setVisible = function () {
             this.listContainer.style.display = "";
         }
 
-        this.show = function(next) {
+        this.show = function (next) {
             let self = this;
 
             //Ask the playList table to the server
-            makeCall("GET" , "GetPlaylistList" , null ,
-                function(request) {
+            makeCall("GET", "GetPlaylistList", null,
+                function (request) {
 
-                    if(request.readyState == XMLHttpRequest.DONE){
+                    if (request.readyState == XMLHttpRequest.DONE) {
 
                         pageOrchestrator.resetErrors();
 
-                        switch(request.status){
+                        switch (request.status) {
                             case 200:
                                 let playlistsToShow = JSON.parse(request.responseText);
 
-                                if(playlistsToShow.length == 0){
+                                if (playlistsToShow.length == 0) {
                                     document.getElementById("playListTableMessage").textContent = "No playList yet";
                                     self.listContainer.style.display = "none";
 
@@ -173,7 +173,7 @@
                                 self.alertContainer.textContent = "";
                                 self.update(playlistsToShow);
                                 //Simulate a click with autoClick function
-                                if(next){
+                                if (next) {
                                     next();
                                 }
                                 break;
@@ -193,16 +193,16 @@
             );
         }
 
-        this.update = function(playlists) {
+        this.update = function (playlists) {
             //Elements of the table for each row
-            let row , playListNameCell , creationDateCell , anchor , linkCell , linkText;
+            let row, playListNameCell, creationDateCell, anchor, linkCell, linkText;
             //Save this to make it visible in the function
             let self = this;
 
             //Empty the table body
             this.listBodyContainer.innerHTML = "";
 
-            playlists.forEach( function(playlist) {
+            playlists.forEach(function (playlist) {
                 //Create the row
                 row = document.createElement("tr");
 
@@ -213,9 +213,9 @@
                 playListNameCell.appendChild(anchor);
                 linkText = document.createTextNode(playlist.title);
                 anchor.appendChild(linkText);
-                anchor.setAttribute("playlistId" , playlist.id);
+                anchor.setAttribute("playlistId", playlist.id);
 
-                anchor.addEventListener("click" , (e) => {
+                anchor.addEventListener("click", (e) => {
                     //Reset the playListSongsToOrder
                     playListSongsToOrder.reset();
                     //Show songs in the playList selected
@@ -245,9 +245,9 @@
 
         }
 
-        this.autoClick = function(playlistId) {
+        this.autoClick = function (playlistId) {
             let e = new Event("click");
-            let selector = "a[playlistId=" + "\"" +  playlistId + "\"]";
+            let selector = "a[playlistId=" + "\"" + playlistId + "\"]";
             //Take the first element or the specified playlist
             let anchorToClick = (playlistId) ?
                 document.querySelector(selector) :
@@ -255,7 +255,7 @@
 
             //console.log("AutoClick select playlist with id: " + anchorToClick.getAttribute("playlistId"));
 
-            if(anchorToClick){
+            if (anchorToClick) {
                 anchorToClick.dispatchEvent(e);
             }
         }
@@ -268,7 +268,7 @@
      * @param listBodyContainer is the body of the table
      * @param playlistId is the playlist the user wants to see the songs
      */
-    function SongsInPlaylist(alertContainer , listContainer , listBodyContainer){
+    function SongsInPlaylist(alertContainer, listContainer, listBodyContainer) {
         this.alertContainer = alertContainer;
         this.listContainer = listContainer;
         this.listBodyContainer = listBodyContainer;
@@ -276,34 +276,33 @@
         this.songs = null;
         this.section = 0;
 
-        this.reset = function() {
+        this.reset = function () {
             this.listContainer.style.display = "none";
             this.alertContainer.textContent = "";
         }
 
-        this.show = function(playlistId) {
+        this.show = function (playlistId) {
             this.playlistId = playlistId;
             let self = this;
 
-            makeCall("GET" , "GetSongsInPlaylist?playlistId=" + playlistId , null ,
-                function(request) {
-                    if(request.readyState == XMLHttpRequest.DONE){
+            makeCall("GET", "GetSongsInPlaylist?playlistId=" + playlistId, null,
+                function (request) {
+                    if (request.readyState == XMLHttpRequest.DONE) {
 
                         pageOrchestrator.resetErrors();
 
-                        switch(request.status){
+                        switch (request.status) {
                             case 200:
                                 let songsReceived = JSON.parse(request.responseText);
 
-                                if(songsReceived.length > 1){
+                                if (songsReceived.length > 1) {
                                     document.getElementById("goToSortingPageButton").style.display = "";
-                                }
-                                else{
+                                } else {
                                     document.getElementById("goToSortingPageButton").style.display = "none";
                                 }
 
 
-                                if(songsReceived.length == 0){
+                                if (songsReceived.length == 0) {
                                     //Empty the body of the table
                                     self.listContainer.style.display = "none";
                                     self.listBodyContainer.innerHTML = "";
@@ -323,9 +322,9 @@
                                 playListSongsToOrder.reset();
 
                                 //Save song titles and ids
-                                self.songs.forEach( function(songToOrder) {
+                                self.songs.forEach(function (songToOrder) {
                                     //Create a new song object
-                                    let song = new Song(songToOrder.songId , songToOrder.songTitle);
+                                    let song = new Song(songToOrder.songId, songToOrder.songTitle);
                                     //Add it to playListSongsToOrder
                                     playListSongsToOrder.addSong(song);
                                 });
@@ -334,7 +333,7 @@
                                 self.update(0);
 
                                 //Launch the autoClick to select a song to show
-                                if(self.playlistId !== songDetails.playlistId){
+                                if (self.playlistId !== songDetails.playlistId) {
                                     self.autoClick();
                                 }
                                 break;
@@ -354,10 +353,11 @@
             );
         }
 
-        this.update = function(section) {
+        this.update = function (section) {
 
             //Elements of the table
-            let row, internalTableCell , imageRow , imageCell, songNameRow , songNameCell, internalTable , anchor, linkText , image;
+            let row, internalTableCell, imageRow, imageCell, songNameRow, songNameCell, internalTable, anchor, linkText,
+                image;
             //Save this to make it visible in the function
             let self = this;
             //Empty the body of the table
@@ -381,34 +381,30 @@
             //Set the current section
             this.section = section;
 
-            if(next){
+            if (next) {
                 handleButtons.showNext();
-            }
-            else{
+            } else {
                 handleButtons.hideNext();
             }
 
-            if(section > 0){
+            if (section > 0) {
                 handleButtons.showBefore();
-            }
-            else{
+            } else {
                 handleButtons.hideBefore();
             }
 
             let songsToShow;
 
-            if (this.songs.length >= section * 5 + 5){
+            if (this.songs.length >= section * 5 + 5) {
                 songsToShow = this.songs.slice(section * 5, section * 5 + 5); // [)
-            }
-
-            else{
+            } else {
                 songsToShow = this.songs.slice(section * 5, this.songs.length); // [)
             }
 
             //Create the main row of the external table
             row = document.createElement("tr");
 
-            songsToShow.forEach( function (songToShow){
+            songsToShow.forEach(function (songToShow) {
                 internalTableCell = document.createElement("td");
                 internalTable = document.createElement("table");
 
@@ -437,10 +433,10 @@
                 songNameCell.appendChild(anchor);
                 linkText = document.createTextNode(songToShow.songTitle);
                 anchor.appendChild(linkText);
-                anchor.setAttribute("songId" , songToShow.songId);
+                anchor.setAttribute("songId", songToShow.songId);
                 anchor.href = "#";
-                anchor.addEventListener("click" , (e) => {
-                    songDetails.show(e.target.getAttribute("songId") , songsInPlayList.playlistId);
+                anchor.addEventListener("click", (e) => {
+                    songDetails.show(e.target.getAttribute("songId"), songsInPlayList.playlistId);
                 });
 
                 row.appendChild(internalTableCell);
@@ -449,9 +445,9 @@
             this.listContainer.style.display = "";
         }
 
-        this.autoClick = function(songId) {
+        this.autoClick = function (songId) {
             let e = new Event("click");
-            let selector = "a[songId=" + "\"" +  songId + "\"]";
+            let selector = "a[songId=" + "\"" + songId + "\"]";
             //Take the first element or the specified playList
 
             let anchorToClick = (songId) ?
@@ -460,9 +456,9 @@
 
             //console.log("AutoClick select song with id: " + anchorToClick.getAttribute("songId"));
 
-            if(anchorToClick){
+            if (anchorToClick) {
                 anchorToClick.dispatchEvent(e);
-            }else{
+            } else {
                 //Show nothing if the playList has no song
                 songDetails.reset();
             }
@@ -475,36 +471,36 @@
      * @param listContainer is the container of the form
      * @param select is the select inside the form to be fulled
      */
-    function SongsNotInPlaylist(alertContainer , listFieldset , listContainer , select){
+    function SongsNotInPlaylist(alertContainer, listFieldset, listContainer, select) {
         this.alertContainer = alertContainer;
         this.listFieldset = listFieldset;
         this.listContainer = listContainer;
         this.select = select;
         this.playlistId = null;
 
-        this.reset = function() {
+        this.reset = function () {
             this.listContainer.style.display = "none";
             this.alertContainer.textContent = "";
         }
 
-        this.setVisible = function() {
+        this.setVisible = function () {
             this.listContainer.style.display = ""
         }
 
-        this.show = function(playlistId) {
+        this.show = function (playlistId) {
             this.playlistId = playlistId;
             let self = this;
 
-            makeCall("GET" , "GetSongsNotInPlaylist?playlistId=" + playlistId , null ,
-                function(request) {
-                    if(request.readyState == XMLHttpRequest.DONE){
+            makeCall("GET", "GetSongsNotInPlaylist?playlistId=" + playlistId, null,
+                function (request) {
+                    if (request.readyState == XMLHttpRequest.DONE) {
                         pageOrchestrator.resetErrors();
 
-                        switch(request.status){
+                        switch (request.status) {
                             case 200:
                                 let songs = JSON.parse(request.responseText);
 
-                                if(songs.length == 0){
+                                if (songs.length == 0) {
                                     self.listFieldset.style.display = "none";
                                     document.getElementById("addSongMessage").textContent = "All songs already in this playList";
                                     return;
@@ -528,7 +524,7 @@
             );
         }
 
-        this.update = function(songsToShow) {
+        this.update = function (songsToShow) {
 
             let option;
 
@@ -537,9 +533,9 @@
             let self = this;
 
             //Add an option for each song
-            songsToShow.forEach(function(songToShow) {
+            songsToShow.forEach(function (songToShow) {
                 option = document.createElement("option");
-                option.setAttribute("value" , songToShow.id);
+                option.setAttribute("value", songToShow.id);
                 option.appendChild(document.createTextNode(songToShow.songTitle));
                 self.select.appendChild(option);
             });
@@ -554,34 +550,34 @@
      * @param listContainer is the container of the table
      * @param listBodyContainer is the body of the table where put the details
      */
-    function SongDetails(alertContainer , listContainer , listBodyContainer){
+    function SongDetails(alertContainer, listContainer, listBodyContainer) {
         this.alertContainer = alertContainer;
         this.listContainer = listContainer;
         this.listBodyContainer = listBodyContainer;
         this.songId = null;
         this.playlistId = null;
 
-        this.reset = function() {
+        this.reset = function () {
             this.listContainer.style.display = "none";
         }
 
-        this.setVisible = function() {
+        this.setVisible = function () {
             this.listContainer.style.display = "";
         }
 
-        this.show = function(songId , playlistId) {
+        this.show = function (songId, playlistId) {
             this.songId = songId;
             this.playlistId = playlistId;
 
             let self = this;
 
-            makeCall("GET" , "GetSongDetails?songId=" + this.songId + "&playlistId=" + this.playlistId , null ,
-                function(request) {
-                    if(request.readyState == XMLHttpRequest.DONE){
+            makeCall("GET", "GetSongDetails?songId=" + this.songId + "&playlistId=" + this.playlistId, null,
+                function (request) {
+                    if (request.readyState == XMLHttpRequest.DONE) {
 
                         pageOrchestrator.resetErrors();
 
-                        switch(request.status){
+                        switch (request.status) {
                             case 200:
                                 let songDetails = JSON.parse(request.responseText);
                                 self.update(songDetails);
@@ -602,8 +598,8 @@
             );
         }
 
-        this.update = function(songDetails) {
-            let row , titleCell , singerCell , albumTitleCell , publicationYearCell , genreCell , playCell;
+        this.update = function (songDetails) {
+            let row, titleCell, singerCell, albumTitleCell, publicationYearCell, genreCell, playCell;
 
             this.listBodyContainer.innerHTML = "";
 
@@ -640,39 +636,39 @@
         }
     }
 
-    function SortingList(alertContainer , divContainer , listContainer , listBodyContainer){
+    function SortingList(alertContainer, divContainer, listContainer, listBodyContainer) {
         this.alertContainer = alertContainer;
         this.divContainer = divContainer;
         this.listContainer = listContainer;
         this.listBodyContainer = listBodyContainer;
         this.playlistId = null;
 
-        this.setPlaylistId = function(playlistId) {
+        this.setPlaylistId = function (playlistId) {
             this.playlistId = playlistId;
         }
 
-        this.reset = function() {
+        this.reset = function () {
             this.divContainer.style.display = "none";
             alertContainer.textContent = "";
         }
 
         //Take the song from playListSongsToOrder and fill the table
-        this.show = function() {
+        this.show = function () {
             //Define the components of the table
-            let row , dataCell , nameCell;
+            let row, dataCell, nameCell;
             //Save this for the closure
             let self = this;
 
             //Empty the table
             this.listBodyContainer.innerHTML = "";
 
-            for(let i = 0 ; i < playListSongsToOrder.songs.length ; i++){
+            for (let i = 0; i < playListSongsToOrder.songs.length; i++) {
 
                 let song = playListSongsToOrder.songs[i];
 
                 row = document.createElement("tr");
                 row.className = "draggable";
-                row.setAttribute("songId" , song.id);
+                row.setAttribute("songId", song.id);
 
                 dataCell = document.createElement("td");
                 nameCell = document.createTextNode(song.title);
@@ -694,37 +690,37 @@
      */
     function PageOrchestrator() {
 
-        this.start = function() {
+        this.start = function () {
             playListSongsToOrder = new PlayListSongsToOrder();
 
             //Set the personal message and show it. Question: why I don't have to save the container in the object as for the userName?
-            personalMessage = new PersonalMessage(sessionStorage.getItem("userName") , document.getElementById("userName"));
+            personalMessage = new PersonalMessage(sessionStorage.getItem("userName"), document.getElementById("userName"));
             personalMessage.show();
 
             //handleButtons = new HandleButtons(document.getElementById("before") , document.getElementById("next"));
-            handleButtons = new HandleButtons(document.getElementById("beforeButton") , document.getElementById("nextButton"));
+            handleButtons = new HandleButtons(document.getElementById("beforeButton"), document.getElementById("nextButton"));
 
             playListMessage = new PlaylistMessage(document.getElementById("playlistNameMessage"));
 
             //Initialize the playList table
-            playlistList = new PlaylistList(document.getElementById("playlistTableError") ,
-                document.getElementById("playlistTable") , document.getElementById("playlistTableBody"));
+            playlistList = new PlaylistList(document.getElementById("playlistTableError"),
+                document.getElementById("playlistTable"), document.getElementById("playlistTableBody"));
 
             //Initialize the songs in the playList
-            songsInPlayList = new SongsInPlaylist(document.getElementById("songTableError") ,
-                document.getElementById("songTable") , document.getElementById("songTableBody"));
+            songsInPlayList = new SongsInPlaylist(document.getElementById("songTableError"),
+                document.getElementById("songTable"), document.getElementById("songTableBody"));
 
             //Initialize songs not in the playlist
-            songsNotInPlayList = new SongsNotInPlaylist(document.getElementById("addSongError") , document.getElementById("addSongToPlaylistFieldset") ,
-                document.getElementById("addSongToPlaylistDiv") , document.getElementById("addSongToPlayList"));
+            songsNotInPlayList = new SongsNotInPlaylist(document.getElementById("addSongError"), document.getElementById("addSongToPlaylistFieldset"),
+                document.getElementById("addSongToPlaylistDiv"), document.getElementById("addSongToPlayList"));
 
             //Initialize the songDetails
-            songDetails = new SongDetails(document.getElementById("songDetailsError") ,
-                document.getElementById("songPage") , document.getElementById("songDetailsTableBody"));
+            songDetails = new SongDetails(document.getElementById("songDetailsError"),
+                document.getElementById("songPage"), document.getElementById("songDetailsTableBody"));
 
             //Initialize the sortingList
-            sortingList = new SortingList(document.getElementById("sortingError") , document.getElementById("sortPlayListPage") ,
-                document.getElementById("sortPlayListTable") , document.getElementById("sortPLayListBody"));
+            sortingList = new SortingList(document.getElementById("sortingError"), document.getElementById("sortPlayListPage"),
+                document.getElementById("sortPlayListTable"), document.getElementById("sortPLayListBody"));
             //Don't show this content
             sortingList.reset();
 
@@ -733,37 +729,37 @@
                 window.sessionStorage.removeItem('username');
             });
             //Add listeners to 'before' and 'next' buttons
-            document.getElementById("beforeButton").addEventListener("click" , () => {
+            document.getElementById("beforeButton").addEventListener("click", () => {
                 pageOrchestrator.resetErrors();
                 songsInPlayList.update(songsInPlayList.section - 1);
             });
-            document.getElementById("nextButton").addEventListener("click" , () => {
+            document.getElementById("nextButton").addEventListener("click", () => {
                 pageOrchestrator.resetErrors();
                 songsInPlayList.update(songsInPlayList.section + 1);
             });
             //Add the listener for the button to reorganized the playList
-            document.getElementById("goToSortingPageButton").addEventListener("click" , () => {
+            document.getElementById("goToSortingPageButton").addEventListener("click", () => {
                 pageOrchestrator.resetErrors();
                 pageOrchestrator.showSortingPage();
             });
             //Add the listener for the button to reorganized the playList
-            document.getElementById("goToMainPageButton").addEventListener("click" , () => {
+            document.getElementById("goToMainPageButton").addEventListener("click", () => {
                 pageOrchestrator.resetErrors();
                 pageOrchestrator.showMainPage();
             });
         }
 
-        this.refresh = function(playlistId) {
+        this.refresh = function (playlistId) {
             //Reset the errors
             this.resetErrors();
 
             //Show a playList sending as parameter the autoclick function
-            playlistList.show( function() {
+            playlistList.show(function () {
                 playlistList.autoClick(playlistId);
             });
         }
 
-        this.showSortingPage = function() {
+        this.showSortingPage = function () {
             handleButtons.hideNext();
             handleButtons.hideBefore();
             playlistList.reset();
@@ -781,7 +777,7 @@
             sortingList.show();
         }
 
-        this.showMainPage = function() {
+        this.showMainPage = function () {
             playlistList.setVisible();
             songsInPlayList.update(0);
             songsNotInPlayList.setVisible();
@@ -796,7 +792,7 @@
             sortingList.reset();
         }
 
-        this.resetErrors = function() {
+        this.resetErrors = function () {
             document.getElementById("playlistTableError").textContent = "";
             document.getElementById("createPlaylistError").textContent = "";
             document.getElementById("songError").textContent = "";
