@@ -14,7 +14,7 @@
     </context-param>
     <context-param>
         <param-name>dbPassword</param-name>
-        <param-value>linuxwsl</param-value>
+        <param-value>DBPASSWORD</param-value>
     </context-param>
     <context-param>
         <param-name>dbDriver</param-name>
