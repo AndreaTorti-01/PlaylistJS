@@ -22,7 +22,7 @@
                             //If ok -> set the userName in the session
                             case 200:
                                 sessionStorage.setItem('user', message);
-                                window.location.href = "Home.html";
+                                window.location.href = "home.html";
                                 break;
                             //If ko -> show the error
                             default:
