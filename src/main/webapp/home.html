@@ -6,12 +6,14 @@
     <link href="css/app.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="favicon.ico" rel="icon" type="image/x-icon"/>
     <script charset="utf-8" defer src="js/utils.js"></script>
-    <script charset="utf-8" defer src="js/getPlaylistsList.js"></script>
-    <script charset="utf-8" defer src="js/getSongs.js"></script>
+    <script charset="utf-8" defer src="js/homeManager.js"></script>
 </head>
 <body>
+
+
 <h1>Welcome to the Home Page</h1>
 <h2>Nice to see you <span id="user"></span></h2>
+
 
 <div class="threeColumns" id="playlistColumn">
     <div class="playlists" id="playlists">
@@ -60,24 +62,23 @@
     </form>
 </div>
 
-<div class="flexCenterHor" id="PlaylistPageId">
 
+<div class="flexCenterHor hidden" id="PlaylistPageId">
+    <button id="backButton">Back</button>
 </div>
 
-<div class="flexCenterHor">
-    <h2>Song Information</h2>
-    <div th:text="${'Title: ' + songTitle}"></div>
-    <div th:text="${'Author: ' + songAuthor}"></div>
-    <div th:text="${'Album: ' + songAlbum}"></div>
-    <div th:text="${'Genre: ' + songGenre}"></div>
-    <div th:text="${'Year: ' + songAlbumYear}"></div>
+
+<div class="flexCenterHor hidden" style="display: none;">
+    <div>Song Information</div>
+    <div id="SongInformationId">
+        <!-- title, author, album, genre, year -->
+        <audio controls>
+            <source th:src="${'/Playlist/audioPlayer/' + userAndSong + '.mp3'}"
+                    type="audio/mpeg">
+        </audio>
+    </div>
 </div>
-<div id="SongInformationId">
-    <audio controls>
-        <source th:src="${'/Playlist/audioPlayer/' + userAndSong + '.mp3'}"
-                type="audio/mpeg">
-    </audio>
-</div>
+
 
 </body>
 </html>

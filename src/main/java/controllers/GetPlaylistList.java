@@ -54,8 +54,6 @@ public class GetPlaylistList extends HttpServlet {
             return;
         }
 
-        System.out.println("hello");
-
         response.setStatus(HttpServletResponse.SC_OK);//Code 200
 
         //Create the jSon with the answer
