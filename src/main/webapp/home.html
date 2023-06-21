@@ -5,8 +5,9 @@
     <title>Home Page</title>
     <link href="css/app.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="favicon.ico" rel="icon" type="image/x-icon"/>
-    <script charset="utf-8" defer src="js/playlistManager.js"></script>
     <script charset="utf-8" defer src="js/utils.js"></script>
+    <script charset="utf-8" defer src="js/getPlaylistsList.js"></script>
+    <script charset="utf-8" defer src="js/getSongs.js"></script>
 </head>
 <body>
 <h1>Welcome to the Home Page</h1>
@@ -43,11 +44,10 @@
         <input id="uploadSongButton" type="button" value="submit">
     </form>
 
-    <form action="#">
+    <form action="#" id="SongsForm">
         <div class="formPrompt">Use this form to create a new playlist</div>
         <input id="playlistName" name="playlistName" placeholder="Playlist Name" required type="text">
-        <input type="checkbox"> <!-- devo capire come funziona per la checkbox -->
-        <input id="createplaylist" type="button" value="submit">
+        <input id="CreatePlaylistButton" type="submit" value="Create!">
 
         <!--
         <label for="dropdown">Select your choices:</label>
@@ -57,9 +57,27 @@
         -->
 
 
-        <input type="submit" value="Create!">
-
     </form>
 </div>
+
+<div class="flexCenterHor" id="PlaylistPageId">
+
+</div>
+
+<div class="flexCenterHor">
+    <h2>Song Information</h2>
+    <div th:text="${'Title: ' + songTitle}"></div>
+    <div th:text="${'Author: ' + songAuthor}"></div>
+    <div th:text="${'Album: ' + songAlbum}"></div>
+    <div th:text="${'Genre: ' + songGenre}"></div>
+    <div th:text="${'Year: ' + songAlbumYear}"></div>
+</div>
+<div id="SongInformationId">
+    <audio controls>
+        <source th:src="${'/Playlist/audioPlayer/' + userAndSong + '.mp3'}"
+                type="audio/mpeg">
+    </audio>
+</div>
+
 </body>
 </html>

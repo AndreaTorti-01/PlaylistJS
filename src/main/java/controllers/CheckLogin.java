@@ -74,6 +74,8 @@ public class CheckLogin extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Code 401
             response.getWriter().println("Incorrect Username or Password");
         } else {
+            // set session attributes
+            request.getSession().setAttribute("user", user);
             // set status to success and reply with user info in json (username)
             response.setStatus(HttpServletResponse.SC_OK); // Code 200
             response.setContentType("application/json");

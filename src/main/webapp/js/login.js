@@ -4,7 +4,6 @@
 (function () {
     document.getElementById("loginButton").addEventListener('click', (e) => {
 
-        console.log("Login event!");
         //Take the closest form
         let form = e.target.closest("form");
 
@@ -14,11 +13,11 @@
 
             //Make the call to the server
             makeCall("POST", 'CheckLogin', form,
-                function (x) {
+                req => {
 
-                    if (x.readyState === XMLHttpRequest.DONE) {
-                        let message = x.responseText;
-                        switch (x.status) {
+                    if (req.readyState == XMLHttpRequest.DONE) {
+                        let message = req.responseText;
+                        switch (req.status) {
                             //If ok -> set the userName in the session
                             case 200:
                                 sessionStorage.setItem('user', message);
