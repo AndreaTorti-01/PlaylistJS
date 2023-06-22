@@ -41,7 +41,6 @@ public class CreatePlaylist extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        connection = ConnectionHandler.getConnection(getServletContext());
 
         // If the user is not logged in (not present in session) redirect to the login
         HttpSession session = request.getSession();
