@@ -14,6 +14,7 @@ public class CoverServlet extends HttpServlet {
     public CoverServlet() {
         super();
     }
+
     @Override
     public void init() throws ServletException {
     }
@@ -25,8 +26,7 @@ public class CoverServlet extends HttpServlet {
         String loginpath = getServletContext().getContextPath() + "/index.html";
         HttpSession session = request.getSession();
         if (session.isNew() || session.getAttribute("user") == null) {
-            response.sendRedirect(loginpath);
-            return;
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No user logged in");
         }
 
         String imageFileName = request.getPathInfo().substring(1); // Extract the file name from the request URL

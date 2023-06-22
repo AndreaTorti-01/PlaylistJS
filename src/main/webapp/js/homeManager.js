@@ -235,7 +235,6 @@
         let audioElement = document.createElement("audio");
         audioElement.classList.add("SongPlayerAudio")
         audioElement.setAttribute("controls", "true");
-        audioElement.setAttribute("autoplay", "true");
         audioElement.setAttribute("src", "audioPlayer/" + username + "/" + songName + ".mp3");
         playerBarDiv.appendChild(audioElement);
 
@@ -243,6 +242,11 @@
     }
 
     // "main"
+
+    // if session storage "user" is not set, redirect to login page
+    if (sessionStorage.getItem('user') == null) {
+        window.location.href = "index.html";
+    }
 
     getPlaylists();
     getAllSongsForCheckboxes()
