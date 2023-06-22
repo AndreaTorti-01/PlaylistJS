@@ -1,6 +1,8 @@
 package controllers;
 
 import beans.User;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dao.PlaylistDAO;
 import org.apache.commons.lang.StringEscapeUtils;
 import utils.ConnectionHandler;
@@ -38,13 +40,7 @@ public class CreatePlaylist extends HttpServlet {
             throws ServletException, IOException {
         connection = ConnectionHandler.getConnection(getServletContext());
 
-        // If the user is not logged in (not present in session) redirect to the login
         HttpSession session = request.getSession();
-        if (session.isNew() || session.getAttribute("user") == null) {
-            String loginpath = getServletContext().getContextPath() + "/index.html";
-            response.sendRedirect(loginpath);
-            return;
-        }
 
         // If the user is logged in correctly then set the user attribute
         User user = (User) session.getAttribute("user");
@@ -52,32 +48,24 @@ public class CreatePlaylist extends HttpServlet {
         // get the playlist name from the post request
         String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
 
-        if (playlistName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No name given");
-            return;
-        }
 
         // get the list of selected songs
-        String[] selectedSongs = request.getParameterValues("checkbox");
-        if (selectedSongs != null) {
-            // for every song, add it to the playlist
-            for (String song : selectedSongs) {
-                try {
-                    playlistDAO.createPlaylist(user.getUsername(), song, playlistName);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        String[] selectedSongs = request.getParameterValues("songs");
+        // for every song, add it to the playlist
+        for (String song : selectedSongs) {
+            try {
+                playlistDAO.createPlaylist(user.getUsername(), song, playlistName);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } else {
-            // no songs selected
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No songs selected");
-            return;
         }
 
-        // return the user to the right view
-        String ctxpath = getServletContext().getContextPath();
-        String path = ctxpath + "/Home";
-        response.sendRedirect(path);
+        Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
+        String json = gson.toJson(selectedSongs);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
+
     }
 
     public void destroy() {

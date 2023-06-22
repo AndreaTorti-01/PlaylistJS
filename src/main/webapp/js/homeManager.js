@@ -98,7 +98,7 @@
         }
     );
 
-    // make a call to the servlet called GetPlaylistList to get all the songs of the logged user to create checkboxes
+    // make a call to the servlet called GetSongList to get all the songs of the logged user to create checkboxes
     makeCall("GET", "GetSongList", null, request => {
             // check the response status
             if (request.readyState == XMLHttpRequest.DONE) {
@@ -118,6 +118,7 @@
                                 createPlaylistForm.insertBefore(div, document.getElementById("CreatePlaylistButton"));
                             }
                         );
+                        //     var songCheckboxes = document.querySelectorAll('.song');
 
                         break;
                     default:
@@ -130,6 +131,42 @@
             }
         }
     );
+// make a call to the servlet called CreatePlaylist to create a new playlist with the name and the songs selected in the checkboxes
+    let createPlaylistButton = document.getElementById("CreatePlaylistButton");
+    let playlistName = document.getElementById("playlistName").value;
+    let songCheckboxes = document.querySelectorAll('.song input[type="checkbox"]:checked');
+    let songs = [];
+    songCheckboxes.forEach(checkbox => {
+            songs.push(checkbox.value);
+        }
+    );
+    let playlist = {
+        playlistName: playlistName,
+        songs: songs
+    };
+
+    createPlaylistButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        makeCall("POST", "CreatePlaylist", JSON.stringify(playlist), request => {
+            // check the response status
+            if (request.readyState == XMLHttpRequest.DONE) {
+                // if the response status is 200 ok
+                switch (request.status) {
+                    case 200:
+                        // print the response text in the console for debug
+                        console.log(request.responseText);
+                        window.location.href = "home.html";
+                        break;
+                    default:
+                        // if the response status is other
+                        // print the error
+                        console.log("error");
+                        break;
+
+                }
+            }
+        });
+    });
 
 
 }())
