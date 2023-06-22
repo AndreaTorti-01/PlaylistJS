@@ -14,14 +14,16 @@ public class PlaylistDAO {
         this.connection = connection;
     }
 
-    public void createPlaylist(String playlistOwner, String playlistSong, String playlistName)
+    public void addSong(String playlistOwner, String playlistSong, String playlistName, int albumYear, String creationDate)
             throws SQLException {
-        String query = "INSERT INTO playlist (playlistOwner, playlistSong, playlistName) VALUES (?, ?, ?)";
+        String query = "INSERT INTO playlist (playlistOwner, playlistSong, playlistName, albumYear, creationDate) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(query);
 
         preparedStatement.setString(1, playlistOwner);
         preparedStatement.setString(2, playlistSong);
         preparedStatement.setString(3, playlistName);
+        preparedStatement.setInt(4, albumYear);
+        preparedStatement.setString(5, creationDate);
 
         preparedStatement.executeUpdate();
     }
