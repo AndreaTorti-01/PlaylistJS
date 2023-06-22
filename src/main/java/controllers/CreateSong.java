@@ -21,13 +21,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Year;
 
-@WebServlet("/UploadSong")
+@WebServlet("/CreateSong")
 @MultipartConfig
 public class CreateSong extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
     private Connection connection = null;
-
     private SongDAO songDAO;
 
     public CreateSong() {
@@ -150,10 +148,11 @@ public class CreateSong extends HttpServlet {
             e.printStackTrace();
         }
 
-        // return the user to the right view
-        String ctxpath = getServletContext().getContextPath();
-        String path = ctxpath + "/Home";
-        response.sendRedirect(path);
+        // send ok response
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"success\": true}");
 
     }
 

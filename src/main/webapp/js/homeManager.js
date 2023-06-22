@@ -1,10 +1,8 @@
 // initialize a function to avoid global scope
 (function () {
 
-    // find the span with the id user
-    let userDiv = document.getElementById("user");
-    // set the text of the span to the username of the logged user
-    userDiv.innerText = sessionStorage.getItem('user');
+    // "definitions"
+
     let getPlaylists = function () {
 
         // make a call to the servlet called GetPlaylistList to get all the playlists of the logged user
@@ -44,8 +42,6 @@
                                 }
                             );
 
-                            // print all the songs in the console for debug
-                            console.log(userPlaylists);
                             break;
                         default:
                             // if the response status is other
@@ -59,8 +55,6 @@
             }
         );
     }
-    getPlaylists();
-
 
     let getSongsInPlaylist = function (playlistName) {
         makeCall("GET", "GetPlaylistSongs?playlistName=" + playlistName, null, request => {
@@ -110,65 +104,110 @@
         );
     }
 
-    // make a call to the servlet called GetSongList to get all the songs of the logged user to create checkboxes
-    makeCall("GET", "GetSongList", null, request => {
-            // check the response status
-            if (request.readyState == XMLHttpRequest.DONE) {
-                // if the response status is 200 ok
-                switch (request.status) {
-                    case 200:
-                        let userSongs = JSON.parse(request.responseText); // this is a list of strings
+    let getAllSongsForCheckboxes = function () {
+        // make a call to the servlet called GetSongList to get all the songs of the logged user to create checkboxes
+        makeCall("GET", "GetSongList", null, request => {
+                // check the response status
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    // if the response status is 200 ok
+                    switch (request.status) {
+                        case 200:
+                            let userSongs = JSON.parse(request.responseText); // this is a list of strings
 
-                        // find the div with id playlists
-                        let createPlaylistForm = document.getElementById("SongsForm");
+                            // find the div with id playlists
+                            let createPlaylistForm = document.getElementById("SongsForm");
 
-                        // append all the songs as children of the form using foreach as checkboxes with the name song
-                        userSongs.forEach(song => {
-                                let div = document.createElement("div");
-                                div.classList.add("song");
-                                div.innerHTML = '<input type="checkbox" name="checkbox" value="' + song + '">' + song;
-                                createPlaylistForm.insertBefore(div, document.getElementById("CreatePlaylistButton"));
+                            // clear all the children of class playlistItem
+                            let songCheckboxes = document.getElementsByClassName("song");
+                            while (songCheckboxes[0]) {
+                                songCheckboxes[0].parentNode.removeChild(songCheckboxes[0]);
                             }
-                        );
 
-                        //     var songCheckboxes = document.querySelectorAll('.song');
+                            // append all the songs as children of the form using foreach as checkboxes with the name song
+                            userSongs.forEach(song => {
+                                    let div = document.createElement("div");
+                                    div.classList.add("song");
+                                    div.innerHTML = '<input type="checkbox" name="checkbox" value="' + song + '">' + song;
+                                    createPlaylistForm.insertBefore(div, document.getElementById("CreatePlaylistButton"));
+                                }
+                            );
 
-                        break;
-                    default:
-                        // if the response status is other
-                        // print the error
-                        console.log("error");
-                        break;
+                            //     var songCheckboxes = document.querySelectorAll('.song');
 
+                            break;
+                        default:
+                            // if the response status is other
+                            // print the error
+                            console.log("error");
+                            break;
+
+                    }
                 }
             }
-        }
-    );
-// make a call to the servlet called CreatePlaylist to create a new playlist with the name and the songs selected in the checkboxes
-    const createPlaylistButton = document.getElementById("CreatePlaylistButton");
-    const form = createPlaylistButton.closest("form");
+        );
+    }
+
+    // "main"
+
+    getPlaylists();
+    getAllSongsForCheckboxes()
+
+    // find the span with the id user
+    let userDiv = document.getElementById("user");
+    // set the text of the span to the username of the logged user
+    userDiv.innerText = sessionStorage.getItem('user');
+
+    // make a call to the servlet called CreatePlaylist to create a new playlist with the name and the songs selected in the checkboxes
+    let createPlaylistButton = document.getElementById("CreatePlaylistButton");
+    let createPlaylistForm = createPlaylistButton.closest("form");
 
     createPlaylistButton.addEventListener('click', (e) => {
         e.preventDefault();
-        makeCall("POST", "CreatePlaylist", form, request => {
-            // check the response status
-            if (request.readyState == XMLHttpRequest.DONE) {
-                // if the response status is 200 ok
-                switch (request.status) {
-                    case 200:
-                        // print the response text in the console for debug
-                        console.log(request.responseText);
-                        getPlaylists();
-                        break;
-                    default:
-                        // if the response status is other
-                        // print the error
-                        console.log("error");
-                        break;
+        if (createPlaylistForm.checkValidity()) {
+            makeCall("POST", "CreatePlaylist", createPlaylistForm, request => {
+                // check the response status
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    // if the response status is 200 ok
+                    switch (request.status) {
+                        case 200:
+                            getPlaylists();
+                            break;
+                        default:
+                            // if the response status is other
+                            // print the error
+                            console.log("error");
+                            break;
 
+                    }
                 }
-            }
-        });
+            });
+        }
+    });
+
+    let uploadSongButton = document.getElementById("uploadSongButton");
+    let uploadSongForm = uploadSongButton.closest("form");
+
+    uploadSongButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (uploadSongForm.checkValidity()) {
+            makeCall("POST", "CreateSong", uploadSongForm, request => {
+                // check the response status
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    // if the response status is 200 ok
+                    switch (request.status) {
+                        case 200:
+                            getAllSongsForCheckboxes();
+                            break;
+                        default:
+                            // if the response status is other
+                            // print the error
+                            console.log("error");
+                            break;
+
+                    }
+                }
+            });
+        }
     });
 
 

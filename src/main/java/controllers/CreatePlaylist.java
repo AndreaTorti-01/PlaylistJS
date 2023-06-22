@@ -7,13 +7,13 @@ import org.apache.commons.lang.StringEscapeUtils;
 import utils.ConnectionHandler;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.Serial;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -21,8 +21,8 @@ import java.sql.SQLException;
  * Servlet implementation class CreatePlaylist
  */
 @WebServlet("/CreatePlaylist")
+@MultipartConfig
 public class CreatePlaylist extends HttpServlet {
-    @Serial
     private static final long serialVersionUID = 1L;
     private Connection connection = null;
     private PlaylistDAO playlistDAO;
@@ -45,6 +45,11 @@ public class CreatePlaylist extends HttpServlet {
 
         // If the user is not logged in (not present in session) redirect to the login
         HttpSession session = request.getSession();
+        if (session.isNew() || session.getAttribute("user") == null) {
+            String loginpath = getServletContext().getContextPath() + "/index.html";
+            response.sendRedirect(loginpath);
+            return;
+        }
 
         // If the user is logged in correctly then set the user attribute
         User user = (User) session.getAttribute("user");
@@ -81,16 +86,16 @@ public class CreatePlaylist extends HttpServlet {
                     e.printStackTrace();
                 }
             }
+
+            // send response ok
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"success\": true}");
         } else {
             // no songs selected
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No songs selected");
-            return;
         }
-
-        // return the user to the right view
-        String ctxpath = getServletContext().getContextPath();
-        String path = ctxpath + "/Home";
-        response.sendRedirect(path);
     }
 
     public void destroy() {
