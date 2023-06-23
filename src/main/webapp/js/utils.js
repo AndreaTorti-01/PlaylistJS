@@ -4,11 +4,12 @@
  * @param url is the servlet that should be called
  * @param formElement is the form that has been selected
  * @param callBack is the function to call when arrive the answer
+ * @param objectToSend
  * @param reset true reset the fields of the form
  */
-function makeCall(method, url, formElement, callBack , objectToSend , reset = true) {
+function makeCall(method, url, formElement, callBack, objectToSend, reset = true) {
     let request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
+    request.onreadystatechange = function () {
         callBack(request);
     };
 
@@ -16,11 +17,11 @@ function makeCall(method, url, formElement, callBack , objectToSend , reset = tr
 
     if (formElement == null && objectToSend == null) {
         request.send();
-    } else if(formElement != null){
+    } else if (formElement != null) {
         //Send the form
         request.send(new FormData(formElement));
     } else {
-        //Send the object
+        //Send the object in JSON format
         let toSend = JSON.stringify(objectToSend);
         request.send(toSend);
     }
