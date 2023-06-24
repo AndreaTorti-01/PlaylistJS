@@ -228,3 +228,11 @@ input[type="number"] {
 .reorderButton {
     background: green;
 }
+
+.selected {
+    color: red;
+}
+
+.notSelected {
+    color: yellow;
+}

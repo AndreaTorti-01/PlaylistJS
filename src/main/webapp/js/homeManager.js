@@ -39,6 +39,7 @@
 
                                         // make a call to the servlet called GetPlaylistSongs to get all the songs of the playlist
                                         getSongsInPlaylistText(playlistName);
+                                        //handleSorting.addEventListeners();
                                         // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                                         document.getElementById("playlistColumn").classList.add("hidden");
                                         document.getElementById("PlaylistPageId").classList.remove("hidden");
@@ -84,7 +85,6 @@
                         case 200:
                             let playlistSongs = JSON.parse(request.responseText); // this is a list of strings
 
-
                             // find the div with id playlists
                             let songsParent = document.getElementById("PlaylistPageId");
 
@@ -102,39 +102,62 @@
                             while (playlistItems[0]) {
                                 playlistItems[0].parentNode.removeChild(playlistItems[0]);
                             }
+
+                            let promises = [];
                             // append all the songs as children of the div using foreach
                             playlistSongs.forEach(song => {
-                                    makeCall("GET", "GetSongDetailsAsJson?songName=" + song, null, request => {
-                                        if (request.readyState == XMLHttpRequest.DONE) {
-                                            // if the response status is 200 ok
-                                            switch (request.status) {
-                                                case 200:
-                                                    let songDetails = JSON.parse(request.responseText); // this is a list of strings
-                                                    console.log(songDetails);
+                                    let promise = new Promise((resolve, reject) => {
+                                        makeCall("GET", "GetSongDetailsAsJson?songName=" + song, null, request => {
+                                            if (request.readyState == XMLHttpRequest.DONE) {
+                                                // if the response status is 200 ok
+                                                switch (request.status) {
+                                                    case 200:
+                                                        let songDetails = JSON.parse(request.responseText); // this is a list of strings
+                                                        console.log(songDetails);
 
-                                                    // get userName from session
-                                                    let username = sessionStorage.getItem("user");
+                                                        // get userName from session
+                                                        let username = sessionStorage.getItem("user");
 
 
-                                                    // display the song name
-                                                    let songDom = document.createElement("div");
-                                                    songDom.classList.add("playlistItem");
-                                                    songDom.innerText = song;
-                                                    songsParent.appendChild(songDom);
+                                                        // display the song name
+                                                        let songDom = document.createElement("div");
+                                                        songDom.classList.add("playlistItem");
+                                                        songDom.innerText = song;
+                                                        songsParent.appendChild(songDom);
 
-                                                    break;
-                                                default:
-                                                    // if the response status is other
-                                                    // print the error
-                                                    console.log("error");
-                                                    break;
+                                                        // Resolve the promise
+                                                        resolve();
 
+                                                        break;
+                                                    default:
+                                                        // if the response status is other
+                                                        // print the error
+                                                        console.log("error");
+                                                        reject();
+                                                        break;
+
+                                                }
                                             }
-                                        }
+                                        });
                                     });
+
+                                    // Add the promise to the promises array
+                                    promises.push(promise);
 
                                 }
                             );
+
+                            // Wait for all promises to resolve
+                            Promise.all(promises)
+                                .then(() => {
+                                    // All makeCall requests have finished
+
+                                    handleSorting.addEventListeners();
+
+                                })
+                                .catch(() => {
+                                    // An error occurred during one or more makeCall requests
+                                });
 
 
                             break;
@@ -142,6 +165,7 @@
                             // if the response status is other
                             // print the error
                             console.log("error");
+
                             break;
 
                     }
@@ -149,6 +173,7 @@
 
             }
         );
+
     }
 
 
