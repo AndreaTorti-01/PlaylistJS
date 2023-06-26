@@ -28,6 +28,9 @@ CREATE TABLE `playlist` (
   `playlistOwner` varchar(45) NOT NULL,
   `playlistSong` varchar(45) NOT NULL,
   `playlistName` varchar(45) NOT NULL,
+  `albumYear` int NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `songIndexJs` int NOT NULL,
   PRIMARY KEY (`playlistOwner`,`playlistName`,`playlistSong`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -90,7 +93,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('user','pass','pietro','osmosi');
+INSERT INTO `users` VALUES ('usern','pass','pietro','osmosi');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -103,4 +106,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-10 13:35:36
+-- Dump completed on 2023-06-26 16:42:21
