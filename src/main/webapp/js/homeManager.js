@@ -203,6 +203,7 @@
                                     document.getElementById("playlistColumn").classList.remove("hidden");
                                     document.getElementById("PlaylistPageId").classList.add("hidden");
                                     destroyNextButton();
+                                    destroyPreviousButton();
                                 }
                             );
 
@@ -285,26 +286,32 @@
                                     console.log("max songs " + maxSongsToDisplay);
                                     let songsInPlaylist = document.getElementsByClassName("playlistItem");
                                     console.log("songs in playlist " + songsInPlaylist.length);
-                                    let songsHidden;
+                                    let hiddenSongs;
                                     if (songsInPlaylist.length - maxSongsToDisplay <= 0) {
-                                        songsHidden = 0;
+                                        hiddenSongs = 0;
                                     } else {
-                                        songsHidden = songsInPlaylist.length - maxSongsToDisplay;
+                                        hiddenSongs = songsInPlaylist.length - maxSongsToDisplay;
                                     }
-                                    console.log("songs hidden " + songsHidden);
+                                    console.log("songs hidden " + hiddenSongs);
 
                                     destroyNextButton();
-                                    let lastIndex;
+                                    destroyPreviousButton();
+
 
                                     for (let i = 0; i < songsInPlaylist.length; i++) {
                                         if (i >= maxSongsToDisplay) {
                                             songsInPlaylist[i].classList.add("hidden");
                                         }
-                                        lastIndex = i;
+
                                     }
 
+
                                     if (songsInPlaylist.length > maxSongsToDisplay) {
-                                        createNextButton(lastIndex, maxSongsToDisplay, songsInPlaylist);
+                                        createNextButton(maxSongsToDisplay, songsInPlaylist);
+                                    }
+
+                                    if (songsInPlaylist[0].classList.contains("hidden")) {
+                                        createPreviousButton(songsInPlaylist);
                                     }
 
 
@@ -436,7 +443,7 @@
     }
 
     getPlaylists();
-    getAllSongsForCheckboxes()
+    getAllSongsForCheckboxes();
 
     // find the span with the id user
     let userDiv = document.getElementById("user");
@@ -504,22 +511,56 @@
         }
     }
 
-    let createNextButton = function (lastIndex, maxSongsToDisplay, songsInPlayList) {
+    let createNextButton = function (maxSongsToDisplay, songsInPlayList) {
         let forwardButton = document.createElement("button");
         forwardButton.innerText = "Next songs";
         forwardButton.classList.add("nextButton");
         document.getElementById("PlaylistPageId").appendChild(forwardButton);
         forwardButton.addEventListener('click', (e) => {
             e.preventDefault();
+            let lastIndex;
+
+            for (let i = 0; i < songsInPlayList.length; i++) {
+                if (i >= maxSongsToDisplay) {
+                    songsInPlayList[i].classList.add("hidden");
+                }
+                if (!songsInPlayList[i].classList.contains("hidden")) {
+                    lastIndex = i;
+                }
+
+            }
+
+
             for (let i = 0; i < lastIndex; i++) {
                 songsInPlayList[i].classList.add("hidden");
             }
-            for (let i = lastIndex; i < lastIndex + maxSongsToDisplay; i++) {
-                songsInPlayList[i].classList.remove("hidden");
+            console.log("last index " + lastIndex);
+            for (let i = lastIndex + 1; i < lastIndex + maxSongsToDisplay; i++) {
+                if (songsInPlayList[i] != null) {
+                    songsInPlayList[i].classList.remove("hidden");
+                }
             }
 
-
         });
+
+
+    }
+
+    let createPreviousButton = function (songsInPlayList) {
+        let previousButton = document.createElement("button");
+        previousButton.innerText = "Previous songs";
+        previousButton.classList.add("nextButton");
+        // insert the button before the first song
+        songsInPlayList[0].parentNode.insertBefore(previousButton, songsInPlayList[0]);
+
+    }
+
+    let destroyPreviousButton = function () {
+        let previousButtons = document.getElementsByClassName("previousButton");
+        // hide all forward buttons
+        for (let i = 0; i < previousButtons.length; i++) {
+            previousButtons[i].remove();
+        }
     }
 
 
