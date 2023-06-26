@@ -30,7 +30,7 @@
                                     div.innerText = song;
                                     let playlistName = song;
                                     playlists.appendChild(div);
-                                    let ReorderButton = document.createElement("div");
+                                    let ReorderButton = document.createElement("button");
                                     ReorderButton.classList.add("reorderButton");
                                     ReorderButton.innerText = "Reorder songs";
                                     ReorderButton.addEventListener('click', (e) => {
@@ -154,6 +154,13 @@
 
                                     handleSorting.addEventListeners();
 
+                                    let forwardButtons = document.getElementsByClassName("forwardButton");
+                                    // hide all forward buttons
+                                    for (let i = 0; i < forwardButtons.length; i++) {
+                                        forwardButtons[i].remove();
+                                    }
+
+
                                 })
                                 .catch(() => {
                                     // An error occurred during one or more makeCall requests
@@ -195,6 +202,7 @@
                                     // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                                     document.getElementById("playlistColumn").classList.remove("hidden");
                                     document.getElementById("PlaylistPageId").classList.add("hidden");
+                                    destroyNextButton();
                                 }
                             );
 
@@ -277,12 +285,28 @@
                                     console.log("max songs " + maxSongsToDisplay);
                                     let songsInPlaylist = document.getElementsByClassName("playlistItem");
                                     console.log("songs in playlist " + songsInPlaylist.length);
+                                    let songsHidden;
+                                    if (songsInPlaylist.length - maxSongsToDisplay <= 0) {
+                                        songsHidden = 0;
+                                    } else {
+                                        songsHidden = songsInPlaylist.length - maxSongsToDisplay;
+                                    }
+                                    console.log("songs hidden " + songsHidden);
+
+                                    destroyNextButton();
+                                    let lastIndex;
 
                                     for (let i = 0; i < songsInPlaylist.length; i++) {
                                         if (i >= maxSongsToDisplay) {
                                             songsInPlaylist[i].classList.add("hidden");
                                         }
+                                        lastIndex = i;
                                     }
+
+                                    if (songsInPlaylist.length > maxSongsToDisplay) {
+                                        createNextButton(lastIndex, maxSongsToDisplay, songsInPlaylist);
+                                    }
+
 
                                 })
                                 .catch(() => {
@@ -471,6 +495,32 @@
             });
         }
     });
+
+    let destroyNextButton = function () {
+        let forwardButtons = document.getElementsByClassName("nextButton");
+        // hide all forward buttons
+        for (let i = 0; i < forwardButtons.length; i++) {
+            forwardButtons[i].remove();
+        }
+    }
+
+    let createNextButton = function (lastIndex, maxSongsToDisplay, songsInPlayList) {
+        let forwardButton = document.createElement("button");
+        forwardButton.innerText = "Next songs";
+        forwardButton.classList.add("nextButton");
+        document.getElementById("PlaylistPageId").appendChild(forwardButton);
+        forwardButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < lastIndex; i++) {
+                songsInPlayList[i].classList.add("hidden");
+            }
+            for (let i = lastIndex; i < lastIndex + maxSongsToDisplay; i++) {
+                songsInPlayList[i].classList.remove("hidden");
+            }
+
+
+        });
+    }
 
 
 }())

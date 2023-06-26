@@ -236,3 +236,8 @@ input[type="number"] {
 .notSelected {
     color: yellow;
 }
+
+.nextButton {
+    background: purple;
+    color: white;
+}
