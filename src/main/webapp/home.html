@@ -43,27 +43,15 @@
             <div class="smolText">Upload the album cover image:</div>
             <input accept="image/*" id="imageFile" name="imageFile" required type="file">
         </div>
-        <!-- another way of doing it... -->
-        <!-- <input type="number" name="albumYear" placeholder="Publication Year" min="1000" th:max="${#dates.format(#dates.createNow(), 'yyyy')}" required> -->
-        <input id="uploadSongButton" type="button" value="submit">
+        <input id="uploadSongButton" type="submit" value="Upload!">
     </form>
 
     <form action="#" id="SongsForm">
         <div class="formPrompt">Use this form to create a new playlist</div>
         <input id="playlistName" name="playlistName" placeholder="Playlist Name" required type="text">
         <input id="CreatePlaylistButton" type="submit" value="Create!">
-
-        <!--
-        <label for="dropdown">Select your choices:</label>
-        <select id="dropdown" name="choices[]" multiple required>
-            <option th:each="song, songIndex: ${userSongs}" th:value="${song}" th:text="${song}"></option>
-        </select>
-        -->
-
-
     </form>
 </div>
-
 
 <div class="flexCenterHor hidden" id="PlaylistPageId">
     <button id="backButton">Back</button>

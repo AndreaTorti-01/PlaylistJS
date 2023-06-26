@@ -12,10 +12,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Servlet implementation class CreatePlaylist
@@ -23,7 +25,6 @@ import java.sql.SQLException;
 @WebServlet("/CreatePlaylist")
 @MultipartConfig
 public class CreatePlaylist extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private Connection connection = null;
     private PlaylistDAO playlistDAO;
     private SongDAO songDAO;
@@ -41,19 +42,12 @@ public class CreatePlaylist extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // If the user is not logged in (not present in session) redirect to the login
-        HttpSession session = request.getSession();
-        if (session.isNew() || session.getAttribute("user") == null) {
-            String loginpath = getServletContext().getContextPath() + "/index.html";
-            response.sendRedirect(loginpath);
-            return;
-        }
+        connection = ConnectionHandler.getConnection(getServletContext());
 
         // If the user is logged in correctly then set the user attribute
-        User user = (User) session.getAttribute("user");
+        User user = (User) request.getSession().getAttribute("user");
 
-        // get the playlist name from the post request
+        // get the playlist name from the form
         String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
 
         if (playlistName.isEmpty()) {
@@ -62,12 +56,10 @@ public class CreatePlaylist extends HttpServlet {
         }
 
         // get the list of selected songs
-        String[] selectedSongs = request.getParameterValues("checkbox");
-        for (String s : selectedSongs) {
-            System.out.println(s);
-        }
-        if (selectedSongs != null) {
-            int albumYear;
+        String[] selectedSongsTemp = request.getParameterValues("checkbox");
+        List<String> selectedSongs = Arrays.asList(selectedSongsTemp);
+        if (!selectedSongs.isEmpty()) {
+            List<Integer> albumYears = new ArrayList<>();
 
             java.util.Date dt = new java.util.Date();
 
@@ -76,21 +68,20 @@ public class CreatePlaylist extends HttpServlet {
 
             String currentTime = sdf.format(dt);
 
-            // for every song, add it to the playlist
-            for (String song : selectedSongs) {
-                try {
-                    albumYear = songDAO.getSongDetails(user.getUsername(), song).getAlbumYear();
-                    playlistDAO.addSong(user.getUsername(), song, playlistName, albumYear, currentTime);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            // create the playlist
+            try {
+                for (String song : selectedSongs) {
+                    albumYears.add(songDAO.getSongDetails(user.getUsername(), song).getAlbumYear());
                 }
+                playlistDAO.createPlaylist(user.getUsername(), selectedSongs, playlistName, albumYears, currentTime);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
-            // send response ok
+            // send ok response with empty body
             response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"success\": true}");
+            response.getWriter().println();
+
         } else {
             // no songs selected
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No songs selected");

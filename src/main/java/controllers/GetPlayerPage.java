@@ -15,16 +15,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 @WebServlet("/playerPage/*")
 public class GetPlayerPage extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private TemplateEngine templateEngine;
-    private Connection connection = null;
     private SongDAO songDAO;
 
     public GetPlayerPage() {
@@ -40,23 +37,15 @@ public class GetPlayerPage extends HttpServlet {
         this.templateEngine = new TemplateEngine();
         this.templateEngine.setTemplateResolver(templateResolver);
         templateResolver.setSuffix(".html");
-        connection = ConnectionHandler.getConnection(getServletContext());
+        Connection connection = ConnectionHandler.getConnection(getServletContext());
         songDAO = new SongDAO(connection);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // If the user is not logged in (not present in session) redirect to the login
-        String loginpath = getServletContext().getContextPath() + "/index.html";
-        HttpSession session = request.getSession();
-        if (session.isNew() || session.getAttribute("user") == null) {
-            response.sendRedirect(loginpath);
-            return;
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // If the user is logged in correctly then set the user attribute
-        User user = (User) session.getAttribute("user");
+        User user = (User) request.getSession().getAttribute("user");
 
         String userAndSong = request.getPathInfo().substring(1); // Extract the file name from the request URL
         String songName = userAndSong.substring(userAndSong.indexOf('/') + 1);
@@ -73,6 +62,7 @@ public class GetPlayerPage extends HttpServlet {
         final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 
         ctx.setVariable("userAndSong", userAndSong);
+        assert song != null;
         ctx.setVariable("songTitle", song.getTitle());
         ctx.setVariable("songAuthor", song.getAuthorName());
         ctx.setVariable("songAlbum", song.getAlbumName());
@@ -84,12 +74,6 @@ public class GetPlayerPage extends HttpServlet {
         // render page
         templateEngine.process(path, ctx, response.getWriter());
 
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
     }
 
 }

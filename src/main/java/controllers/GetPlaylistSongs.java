@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,8 +20,6 @@ import java.util.List;
 @WebServlet("/GetPlaylistSongs")
 @MultipartConfig
 public class GetPlaylistSongs extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private Connection connection;
     private PlaylistDAO playlistDAO;
 
     public GetPlaylistSongs() {
@@ -30,14 +27,13 @@ public class GetPlaylistSongs extends HttpServlet {
     }
 
     public void init() throws ServletException {
-        connection = ConnectionHandler.getConnection(getServletContext());
+        Connection connection = ConnectionHandler.getConnection(getServletContext());
         playlistDAO = new PlaylistDAO(connection);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        User user = (User) request.getSession().getAttribute("user");
         String playlistName = request.getParameter("playlistName");
         List<String> playlistSongs = null;
         try {

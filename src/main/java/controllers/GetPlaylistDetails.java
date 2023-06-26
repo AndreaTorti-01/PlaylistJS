@@ -15,7 +15,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,9 +25,7 @@ import java.util.List;
  */
 @WebServlet("/GetPlaylistDetails")
 public class GetPlaylistDetails extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     int numberOfSongs;
-    private Connection connection = null;
     private TemplateEngine templateEngine;
     private PlaylistDAO playlistDAO;
 
@@ -44,22 +41,15 @@ public class GetPlaylistDetails extends HttpServlet {
         this.templateEngine = new TemplateEngine();
         this.templateEngine.setTemplateResolver(templateResolver);
         templateResolver.setSuffix(".html");
-        connection = ConnectionHandler.getConnection(getServletContext());
+        Connection connection = ConnectionHandler.getConnection(getServletContext());
         playlistDAO = new PlaylistDAO(connection);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // If the user is not logged in (not present in session) redirect to the login
-        String loginpath = getServletContext().getContextPath() + "/index.html";
-        HttpSession session = request.getSession();
-        if (session.isNew() || session.getAttribute("user") == null) {
-            response.sendRedirect(loginpath);
-            return;
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // If the user is logged in correctly then set the user attribute
-        User user = (User) session.getAttribute("user");
+        User user = (User) request.getSession().getAttribute("user");
+        
         String playlistName;
         int page = Integer.parseInt(request.getParameter("page"));
         // Set the offset as the page*5

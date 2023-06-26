@@ -9,7 +9,10 @@ import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +27,6 @@ import java.time.Year;
 @WebServlet("/CreateSong")
 @MultipartConfig
 public class CreateSong extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private Connection connection = null;
     private SongDAO songDAO;
 
@@ -39,19 +41,10 @@ public class CreateSong extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        // If the user is not logged in (not present in session) redirect to the login
-        HttpSession session = request.getSession();
-        if (session.isNew() || session.getAttribute("user") == null) {
-            String loginpath = getServletContext().getContextPath() + "/index.html";
-            response.sendRedirect(loginpath);
-            return;
-        }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // If the user is logged in correctly then set the user attribute
-        User user = (User) session.getAttribute("user");
+        User user = (User) request.getSession().getAttribute("user");
 
         // get file parts from the POST request
         Part songFilePart = request.getPart("songFile");

@@ -19,7 +19,6 @@ import java.sql.SQLException;
 @WebServlet("/CheckLogin")
 @MultipartConfig
 public class CheckLogin extends HttpServlet {
-    private static final long serialVersionUID = 1L;
     private Connection connection = null;
 
     public CheckLogin() {
@@ -34,11 +33,11 @@ public class CheckLogin extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
 
         // obtain and escape params
-        String usrn = null;
-        String pwd = null;
+        String usrn;
+        String pwd;
 
         try {
             usrn = StringEscapeUtils.escapeJava(request.getParameter("username"));
@@ -56,7 +55,7 @@ public class CheckLogin extends HttpServlet {
 
         // query db to authenticate for user
         UserDAO userDao = new UserDAO(connection);
-        User user = null;
+        User user;
         try {
             // assegna all'oggetto user i campi recuperati eseguendo la query tramite il DAO
             user = userDao.checkCredentials(usrn, pwd);
@@ -67,8 +66,6 @@ public class CheckLogin extends HttpServlet {
 
         // If the user exists, add info to the session and go to home page, otherwise
         // show login page with error message
-
-        String path;
         if (user == null) {
             // set status to error and reply with error message
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Code 401

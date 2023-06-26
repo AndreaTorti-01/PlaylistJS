@@ -7,14 +7,12 @@ import dao.PlaylistDAO;
 import utils.ConnectionHandler;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,8 +21,6 @@ import java.util.List;
 @WebServlet("/GetPlaylistList")
 @MultipartConfig
 public class GetPlaylistList extends HttpServlet {
-
-    private static final long serialVersionUID = 1L;
     private Connection connection;
 
     public void init() {
@@ -37,12 +33,11 @@ public class GetPlaylistList extends HttpServlet {
         }
     }
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         //Take the user from the session
-        HttpSession s = request.getSession();
-        User user = (User) s.getAttribute("user");
-        List<String> playlists = null;
+        User user = (User) request.getSession().getAttribute("user");
+        List<String> playlists;
 
         PlaylistDAO pDao = new PlaylistDAO(connection);
 
@@ -64,11 +59,6 @@ public class GetPlaylistList extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jSon);
     }
-
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
-    }
-
 
     public void destroy() {
         try {

@@ -16,9 +16,6 @@ import java.sql.SQLException;
 
 @WebServlet("/GetSongDetailsAsJson")
 public class GetSongDetailsAsJson extends HttpServlet {
-
-    private static final long serialVersionUID = 1L;
-    private Connection connection = null;
     private SongDAO songDAO;
 
     public GetSongDetailsAsJson() {
@@ -27,23 +24,12 @@ public class GetSongDetailsAsJson extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        connection = ConnectionHandler.getConnection(getServletContext());
+        Connection connection = ConnectionHandler.getConnection(getServletContext());
         songDAO = new SongDAO(connection);
     }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        // if the user is not logged in (not present in session) redirect to the login
-        if (request.getSession().isNew() || request.getSession().getAttribute("user") == null) {
-            String loginpath = getServletContext().getContextPath() + "/index.html";
-            try {
-                response.sendRedirect(loginpath);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-
         // if the user is logged in correctly then set the user attribute
         User user = (User) request.getSession().getAttribute("user");
 
@@ -74,7 +60,7 @@ public class GetSongDetailsAsJson extends HttpServlet {
 
         // convert all the song details to strings and send them as json
         String json = gson.toJson(song);
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
