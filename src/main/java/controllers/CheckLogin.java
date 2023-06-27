@@ -20,6 +20,7 @@ import java.sql.SQLException;
 @MultipartConfig
 public class CheckLogin extends HttpServlet {
     private Connection connection = null;
+    private UserDAO userDao;
 
     public CheckLogin() {
         super();
@@ -30,10 +31,10 @@ public class CheckLogin extends HttpServlet {
         ServletContext servletContext = getServletContext();
         // connect to database
         connection = ConnectionHandler.getConnection(servletContext);
+        userDao = new UserDAO(connection);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // obtain and escape params
         String usrn;
@@ -54,7 +55,6 @@ public class CheckLogin extends HttpServlet {
         }
 
         // query db to authenticate for user
-        UserDAO userDao = new UserDAO(connection);
         User user;
         try {
             // assegna all'oggetto user i campi recuperati eseguendo la query tramite il DAO

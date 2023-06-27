@@ -19,9 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Servlet implementation class CreatePlaylist
- */
 @WebServlet("/CreatePlaylist")
 @MultipartConfig
 public class CreatePlaylist extends HttpServlet {
@@ -31,7 +28,6 @@ public class CreatePlaylist extends HttpServlet {
 
     public CreatePlaylist() {
         super();
-
     }
 
     public void init() throws ServletException {
@@ -40,8 +36,8 @@ public class CreatePlaylist extends HttpServlet {
         songDAO = new SongDAO(connection);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         connection = ConnectionHandler.getConnection(getServletContext());
 
         // If the user is logged in correctly then set the user attribute
@@ -57,8 +53,8 @@ public class CreatePlaylist extends HttpServlet {
 
         // get the list of selected songs
         String[] selectedSongsTemp = request.getParameterValues("checkbox");
-        List<String> selectedSongs = Arrays.asList(selectedSongsTemp);
-        if (!selectedSongs.isEmpty()) {
+        if (selectedSongsTemp != null) {
+            List<String> selectedSongs = Arrays.asList(selectedSongsTemp);
             List<Integer> albumYears = new ArrayList<>();
 
             java.util.Date dt = new java.util.Date();
@@ -83,7 +79,6 @@ public class CreatePlaylist extends HttpServlet {
             response.getWriter().println();
 
         } else {
-            // no songs selected
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No songs selected");
         }
     }
