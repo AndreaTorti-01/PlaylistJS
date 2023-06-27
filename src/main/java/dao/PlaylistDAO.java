@@ -167,4 +167,36 @@ public class PlaylistDAO {
         preparedStatement.executeUpdate();
     }
 
+    public void alterSongOrderJS(String username, String playlistName, List<String> songs) throws SQLException {
+        connection.setAutoCommit(false); // transaction block start
+
+        String query = "UPDATE playlist SET songIndexJs = ? WHERE playlistOwner = ? AND playlistName = ? AND playlistSong = ?";
+        PreparedStatement preparedStatement = null;
+
+        try {
+            for (int i = 0; i < songs.size(); i++) {
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setInt(1, i);
+                preparedStatement.setString(2, username);
+                preparedStatement.setString(3, playlistName);
+                preparedStatement.setString(4, songs.get(i));
+
+                preparedStatement.executeUpdate();
+
+                connection.commit();
+            }
+        } catch (SQLException e) {
+            connection.rollback(); // transaction block abort
+            System.out.println("Errore nell'aggiornamento dell'ordine delle canzoni");
+        } finally {
+            connection.setAutoCommit(true); // transaction block end
+            if (preparedStatement != null)
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
 }

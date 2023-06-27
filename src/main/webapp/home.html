@@ -55,6 +55,17 @@
 
 <div class="flexCenterHor hidden" id="PlaylistPageId">
     <button id="backButton">Back</button>
+
+    <form id="AddSongForm" style="max-height: 20em">
+        <select id="addSongFormSelectionId" name="newSong" required>
+            <option disabled selected value="">Select Song to add</option>
+        </select>
+        <input id="playlistNameInAddSongFormId" name="id" type="hidden">
+        <input id="addSongButton" type="submit" value="Add Song!">
+    </form>
+
+    <button id="prevButton">Previous</button>
+    <button id="nextButton">Next</button>
 </div>
 
 

@@ -4,7 +4,6 @@ function HandleSorting() {
 
     let startElement = null;
 
-
     this.addEventListeners = function () {
         let elements = document.getElementsByClassName('playlistItem');
 

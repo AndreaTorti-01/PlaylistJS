@@ -23,7 +23,10 @@
                     switch (req.status) {
                         // If ok -> set the userName in the session
                         case 200:
-                            sessionStorage.setItem('user', message);
+                            // message is json containing nomeUser and user to save in session storage
+                            const json = JSON.parse(message);
+                            sessionStorage.setItem('nomeUser', json.nomeUser);
+                            sessionStorage.setItem('user', json.user);
                             window.location.href = "home.html";
                             break;
                         // If ko -> show the error

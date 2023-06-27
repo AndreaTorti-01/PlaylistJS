@@ -207,6 +207,10 @@ a {
     color: white;
 }
 
+.albumCover {
+    width: 9em;
+}
+
 #createPlaylist {
     gap: 0.3em;
 }
@@ -237,12 +241,12 @@ input[type="number"] {
     color: yellow;
 }
 
-.nextButton {
+#nextButton {
     background: purple;
     color: white;
 }
 
-.previousButton {
+#prevButton {
     background: purple;
     color: white;
 }

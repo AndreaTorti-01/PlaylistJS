@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import utils.ConnectionHandler;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/AddSong")
+@MultipartConfig
 public class AddSong extends HttpServlet {
     private Connection connection = null;
     private PlaylistDAO playlistDAO;
@@ -95,6 +97,7 @@ public class AddSong extends HttpServlet {
 
             // send ok with empty body
             response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("text/plain");
             response.getWriter().println();
 
         } else {
