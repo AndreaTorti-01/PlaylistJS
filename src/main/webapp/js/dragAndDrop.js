@@ -53,10 +53,12 @@ function HandleSorting() {
 
         if (elems.indexOf(startElement) < indexDest) {
             startElement.parentElement.insertBefore(startElement, elems[indexDest + 1]);
+            dest.parentElement.insertBefore(dest, elems[elems.indexOf(startElement) + 1]);
         } else {
             startElement.parentElement.insertBefore(startElement, elems[indexDest]);
+            dest.parentElement.insertBefore(dest, elems[elems.indexOf(startElement) + 1]);
         }
-        unselectedElems(elems);
+        //unselectedElems(elems);
     }
 
 
