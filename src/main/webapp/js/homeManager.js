@@ -307,6 +307,8 @@
                                             case 200:
                                                 let songDetails = JSON.parse(request.responseText); // this is a list of strings
 
+                                                /*
+
                                                 // get userName from session
                                                 let username = sessionStorage.getItem("user");
                                                 let songBox = document.createElement("div");
@@ -331,8 +333,10 @@
                                                     showPlayer(song)
                                                 });
 
+                                                */
+
                                                 // Resolve the promise
-                                                resolve();
+                                                resolve(songDetails);
                                                 break;
                                             default:
                                                 // if the response status is other
@@ -351,9 +355,36 @@
 
                         // Wait for all playlistItems to be received
                         Promise.all(promises)
-                            .then(() => {
+                            .then((objects) => {
 
-                                // Manipulate the "playlistItem" divs here
+                                for (let i = 0; i < objects.length; i++) {
+
+                                    let username = sessionStorage.getItem("user");
+                                    let songBox = document.createElement("div");
+                                    songBox.classList.add("playlistItem");
+
+                                    // display the cover using getAlbumCover to get the image
+                                    let coverDom = document.createElement("img");
+                                    coverDom.src = "cover/" + username + "/" + objects[i].albumName + ".jpg";
+                                    coverDom.classList.add("albumCover");
+                                    songBox.appendChild(coverDom);
+
+                                    // display the song name
+                                    let songDom = document.createElement("div");
+                                    songDom.innerText = objects[i].title;
+                                    songBox.appendChild(songDom);
+
+                                    // append songBox to songsParent before button of id "nextButton"
+                                    songsParent.insertBefore(songBox, document.getElementById("nextButton"));
+
+                                    // add a listener to the div to make it clickable
+                                    songDom.addEventListener('click', function () {
+                                        showPlayer(objects[i].title)
+                                    });
+
+                                }
+
+                                // Manipulate the "playlistItem" divs here to show only 5 at a time
                                 const playlistItems = Array.from(document.getElementsByClassName("playlistItem"));
                                 const prevButton = document.getElementById("prevButton");
                                 const nextButton = document.getElementById("nextButton");
