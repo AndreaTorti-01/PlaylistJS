@@ -47,7 +47,7 @@
 
                             playlists.appendChild(playlistContainerDiv);
 
-                            ReorderButton.addEventListener('click', (e) => {
+                            ReorderButton.addEventListener('click', () => {
                                 // get the name of the playlist
                                 //let playlistName = e.target.innerText;
 
@@ -60,7 +60,7 @@
                             });
 
                             // add a listener to the div to make it clickable
-                            playlistListItem.addEventListener('click', (e) => {
+                            playlistListItem.addEventListener('click', () => {
                                 // get the name of the playlist
                                 //let playlistName = e.target.innerText;
 
@@ -99,7 +99,7 @@
                         let songsParent = document.getElementById("PlaylistPageId");
 
                         let hideButton = document.getElementById("backButton");
-                        hideButton.addEventListener('click', (e) => {
+                        hideButton.addEventListener('click', () => {
                             // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                             document.getElementById("playlistColumn").classList.remove("hidden");
                             document.getElementById("PlaylistPageId").classList.add("hidden");
@@ -124,11 +124,6 @@
                                         // if the response status is 200 ok
                                         switch (request.status) {
                                             case 200:
-                                                let songDetails = JSON.parse(request.responseText); // this is a list of strings
-
-                                                // get userName from session
-                                                let username = sessionStorage.getItem("user");
-
                                                 // display the song name
                                                 let songDom = document.createElement("div");
                                                 songDom.classList.add("playlistItem");
@@ -344,12 +339,14 @@
                                     addSongFormSelectionItems[0].parentNode.removeChild(addSongFormSelectionItems[0]);
                                 }
 
+                                // get all the songs from the database
                                 let allSongs = await getAllSongsForCheckboxes();
 
                                 // append all the songs as children of the div using foreach
                                 // Loop through the playlistSongs array
                                 allSongs.forEach(song => {
                                     let songOption = document.createElement("option");
+                                    songOption.classList.add("addSongFormSelectionItem");
                                     songOption.innerText = song;
                                     songOption.value = song;
                                     addSongFormSelection.appendChild(songOption);
