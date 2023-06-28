@@ -126,6 +126,17 @@
     // funzione che prende i nomi delle canzoni della playlist mostrando solo i titoli
     let showReorderPage = function (playlistName) {
 
+        let hideButton = document.getElementById("backButton");
+        hideButton.addEventListener('click', () => {
+            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
+            document.getElementById("playlistColumn").classList.remove("hidden");
+            document.getElementById("PlaylistPageId").classList.add("hidden");
+
+            document.getElementById("PlaylistPageId").querySelectorAll(".playlistItem").forEach(item => {
+                console.log(item.innerText);
+            });
+        });
+
         // hide the prevButton and nextButton
         document.getElementById("prevButton").classList.add("hidden");
         document.getElementById("nextButton").classList.add("hidden");
@@ -142,13 +153,6 @@
 
                         // find the div with id playlists
                         let songsParent = document.getElementById("PlaylistPageId");
-
-                        let hideButton = document.getElementById("backButton");
-                        hideButton.addEventListener('click', () => {
-                            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
-                            document.getElementById("playlistColumn").classList.remove("hidden");
-                            document.getElementById("PlaylistPageId").classList.add("hidden");
-                        });
 
                         // clear all the children of class playlistItem
                         let playlistItems = document.getElementsByClassName("playlistItem");
@@ -191,10 +195,12 @@
 
     let showPlaylistPage = function (playlistName) {
 
-        // populate the addSongForm with the playlistName songs
-        let addSongButton = document.getElementById("addSongButton");
-        let addSongFormSelection = document.getElementById("addSongFormSelectionId");
-        let addSongForm = addSongButton.closest("form");
+        let hideButton = document.getElementById("backButton");
+        hideButton.addEventListener('click', () => {
+            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
+            document.getElementById("playlistColumn").classList.remove("hidden");
+            document.getElementById("PlaylistPageId").classList.add("hidden");
+        });
 
         // clear all the children of class addSongFormSelection
         let addSongFormSelectionItems = document.getElementsByClassName("addSongFormSelectionItem");
@@ -211,8 +217,12 @@
                     case 200:
                         let allSongs = JSON.parse(request.responseText); // this is a list of strings
 
-                        // append all the songs as children of the div using foreach
-                        // Loop through the playlistSongs array
+                        // populate the addSongForm with all the songs
+                        let addSongButton = document.getElementById("addSongButton");
+                        let addSongFormSelection = document.getElementById("addSongFormSelectionId");
+                        let addSongForm = addSongButton.closest("form");
+
+                        // append all the songs as children of the form select using foreach
                         allSongs.forEach(song => {
                             let songOption = document.createElement("option");
                             songOption.classList.add("addSongFormSelectionItem");
@@ -221,6 +231,7 @@
                             addSongFormSelection.appendChild(songOption);
                         });
 
+                        // add a listener to the addSongButton
                         addSongButton.addEventListener('click', (e) => {
                             e.preventDefault();
                             if (addSongForm.checkValidity()) {
@@ -267,6 +278,7 @@
         document.getElementById("prevButton").classList.add("hidden");
         document.getElementById("nextButton").classList.add("hidden");
 
+        // get all the songs of the chosen playlist
         makeCall("GET", "GetPlaylistSongs?playlistName=" + playlistName, null, request => {
             // check the response status
             if (request.readyState == XMLHttpRequest.DONE) {
@@ -277,13 +289,6 @@
 
                         // find the div with id playlists
                         let songsParent = document.getElementById("PlaylistPageId");
-
-                        let hideButton = document.getElementById("backButton");
-                        hideButton.addEventListener('click', () => {
-                            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
-                            document.getElementById("playlistColumn").classList.remove("hidden");
-                            document.getElementById("PlaylistPageId").classList.add("hidden");
-                        });
 
                         // clear all the children of class playlistItem
                         let playlistItems = document.getElementsByClassName("playlistItem");
