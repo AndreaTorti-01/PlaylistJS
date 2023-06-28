@@ -1,9 +1,47 @@
 // initialize a function to avoid global scope
 (function () {
 
+    // drag and drop utilities
+
+    function dragStart(event) {
+        startElement = event.target.closest(".playlistItem");
+        console.log("drag iniziato");
+    }
+
+
+    function dragOver(event) {
+        event.preventDefault();
+        let dest = event.target.closest(".playlistItem");
+        dest.classList.add("selected");
+        console.log("drag terminato");
+    }
+
+
+    function dragLeave(event) {
+        let dest = event.target.closest(".playlistItem");
+        dest.classList.add("notSelected");
+    }
+
+    function drop(event) {
+        let dest = event.target.closest(".playlistItem");
+        // get the index of the element being dragged
+        let div = dest.closest("#PlaylistPageId");
+        let elems = Array.from(div.querySelectorAll('div'));
+        let indexDest = elems.indexOf(dest);
+
+        if (elems.indexOf(startElement) < indexDest) {
+            startElement.parentElement.insertBefore(startElement, elems[indexDest + 1]);
+            dest.parentElement.insertBefore(dest, elems[elems.indexOf(startElement) + 1]);
+        } else {
+            startElement.parentElement.insertBefore(startElement, elems[indexDest]);
+            dest.parentElement.insertBefore(dest, elems[elems.indexOf(startElement) + 1]);
+        }
+        //unselectedElems(elems);
+    }
+
     // "definitions"
 
-    let getPlaylists = function () {
+    let showPlaylistsList = function () {
 
         // get all elements of class playlistListItem and remove them
         let playlistListItems = document.getElementsByClassName("playlistListItem");
@@ -52,7 +90,7 @@
                                 //let playlistName = e.target.innerText;
 
                                 // make a call to the servlet called GetPlaylistSongs to get all the songs of the playlist
-                                getSongsInPlaylistText(playlistName);
+                                showReorderPage(playlistName);
                                 //handleSorting.addEventListeners();
                                 // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                                 document.getElementById("playlistColumn").classList.add("hidden");
@@ -65,7 +103,7 @@
                                 //let playlistName = e.target.innerText;
 
                                 // make a call to the servlet called GetPlaylist to get all the songs of the playlist
-                                getSongsInPlaylist(playlistName);
+                                showPlaylistPage(playlistName);
                                 // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                                 document.getElementById("playlistColumn").classList.add("hidden");
                                 document.getElementById("PlaylistPageId").classList.remove("hidden");
@@ -86,7 +124,14 @@
     }
 
     // funzione che prende i nomi delle canzoni della playlist mostrando solo i titoli
-    let getSongsInPlaylistText = function (playlistName) {
+    let showReorderPage = function (playlistName) {
+
+        // hide the prevButton and nextButton
+        document.getElementById("prevButton").classList.add("hidden");
+        document.getElementById("nextButton").classList.add("hidden");
+        // hide the AddSongForm
+        document.getElementById("AddSongForm").classList.add("hidden");
+
         makeCall("GET", "GetPlaylistSongs?playlistName=" + playlistName, null, request => {
             // check the response status
             if (request.readyState == XMLHttpRequest.DONE) {
@@ -103,9 +148,6 @@
                             // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                             document.getElementById("playlistColumn").classList.remove("hidden");
                             document.getElementById("PlaylistPageId").classList.add("hidden");
-                            // also hide the prevButton and nextButton
-                            document.getElementById("prevButton").classList.add("hidden");
-                            document.getElementById("nextButton").classList.add("hidden");
                         });
 
                         // clear all the children of class playlistItem
@@ -115,59 +157,21 @@
                             playlistItems[0].parentNode.removeChild(playlistItems[0]);
                         }
 
-                        let promises = [];
                         // append all the songs as children of the div using foreach
                         playlistSongs.forEach(song => {
-                            let promise = new Promise((resolve, reject) => {
-                                makeCall("GET", "GetSongDetailsAsJson?songName=" + song, null, request => {
-                                    if (request.readyState == XMLHttpRequest.DONE) {
-                                        // if the response status is 200 ok
-                                        switch (request.status) {
-                                            case 200:
-                                                // display the song name
-                                                let songDom = document.createElement("div");
-                                                songDom.classList.add("playlistItem");
-                                                songDom.innerText = song;
-                                                songsParent.appendChild(songDom);
+                            let songDom = document.createElement("div");
+                            songDom.classList.add("playlistItem");
+                            songDom.innerText = song;
 
-                                                // Resolve the promise
-                                                resolve();
+                            // support for drag and drop
+                            songDom.draggable = true;
+                            songDom.addEventListener("dragstart", dragStart);
+                            songDom.addEventListener("dragover", dragOver);
+                            songDom.addEventListener("dragleave", dragLeave);
+                            songDom.addEventListener("drop", drop);
 
-                                                break;
-                                            default:
-                                                // if the response status is other
-                                                // print the error
-                                                console.log("error");
-                                                reject();
-                                                break;
-
-                                        }
-                                    }
-                                });
-                            });
-
-                            // Add the promise to the promises array
-                            promises.push(promise);
-
+                            songsParent.appendChild(songDom);
                         });
-
-                        // Wait for all promises to resolve
-                        Promise.all(promises)
-                            .then(() => {
-                                // All makeCall requests have finished
-
-                                handleSorting.addEventListeners();
-
-                                let forwardButtons = document.getElementsByClassName("forwardButton");
-                                // hide all forward buttons
-                                for (let i = 0; i < forwardButtons.length; i++) {
-                                    forwardButtons[i].remove();
-                                }
-
-                            })
-                            .catch(() => {
-                                // An error occurred during one or more makeCall requests
-                            });
 
                         break;
                     default:
@@ -185,7 +189,84 @@
     }
 
 
-    let getSongsInPlaylist = function (playlistName) {
+    let showPlaylistPage = function (playlistName) {
+
+        // populate the addSongForm with the playlistName songs
+        let addSongButton = document.getElementById("addSongButton");
+        let addSongFormSelection = document.getElementById("addSongFormSelectionId");
+        let addSongForm = addSongButton.closest("form");
+
+        // clear all the children of class addSongFormSelection
+        let addSongFormSelectionItems = document.getElementsByClassName("addSongFormSelectionItem");
+        while (addSongFormSelectionItems[1]) {
+            addSongFormSelectionItems[0].parentNode.removeChild(addSongFormSelectionItems[0]);
+        }
+
+        // get all the songs
+        makeCall("GET", "GetSongList", null, request => {
+            // check the response status
+            if (request.readyState == XMLHttpRequest.DONE) {
+                // if the response status is 200 ok
+                switch (request.status) {
+                    case 200:
+                        let allSongs = JSON.parse(request.responseText); // this is a list of strings
+
+                        // append all the songs as children of the div using foreach
+                        // Loop through the playlistSongs array
+                        allSongs.forEach(song => {
+                            let songOption = document.createElement("option");
+                            songOption.classList.add("addSongFormSelectionItem");
+                            songOption.innerText = song;
+                            songOption.value = song;
+                            addSongFormSelection.appendChild(songOption);
+                        });
+
+                        addSongButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (addSongForm.checkValidity()) {
+
+                                let playlistNameInAddSongForm = document.getElementById("playlistNameInAddSongFormId");
+                                playlistNameInAddSongForm.value = playlistName;
+
+                                makeCall("POST", "AddSong", addSongForm, request => {
+                                    // check the response status
+                                    if (request.readyState == XMLHttpRequest.DONE) {
+                                        // if the response status is 200 ok
+                                        switch (request.status) {
+                                            case 200:
+                                                showPlaylistPage(playlistName);
+                                                break;
+                                            default:
+                                                // if the response status is other
+                                                // print the error
+                                                console.log("error");
+                                                break;
+
+                                        }
+                                    }
+                                });
+                            }
+                        });
+
+                        break;
+                    default:
+                        // if the response status is other
+                        // print the error
+                        console.log("error");
+                        break;
+
+                }
+            }
+        });
+
+
+        // show the form
+        document.getElementById("AddSongForm").classList.remove("hidden");
+
+        // hide the prevButton and nextButton
+        document.getElementById("prevButton").classList.add("hidden");
+        document.getElementById("nextButton").classList.add("hidden");
+
         makeCall("GET", "GetPlaylistSongs?playlistName=" + playlistName, null, request => {
             // check the response status
             if (request.readyState == XMLHttpRequest.DONE) {
@@ -199,9 +280,6 @@
 
                         let hideButton = document.getElementById("backButton");
                         hideButton.addEventListener('click', () => {
-                            // hide the prevButton and nextButton
-                            document.getElementById("prevButton").classList.add("hidden");
-                            document.getElementById("nextButton").classList.add("hidden");
                             // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                             document.getElementById("playlistColumn").classList.remove("hidden");
                             document.getElementById("PlaylistPageId").classList.add("hidden");
@@ -273,20 +351,19 @@
 
                         // Wait for all playlistItems to be received
                         Promise.all(promises)
-                            .then(async () => {
+                            .then(() => {
 
                                 // Manipulate the "playlistItem" divs here
                                 const playlistItems = Array.from(document.getElementsByClassName("playlistItem"));
                                 const prevButton = document.getElementById("prevButton");
                                 const nextButton = document.getElementById("nextButton");
 
-                                const itemsPerPage = 5;
                                 let currentPage = 1;
 
                                 // Function to show items for the current page
-                                function showItems() {
-                                    const startIndex = (currentPage - 1) * itemsPerPage;
-                                    const endIndex = startIndex + itemsPerPage;
+                                function showFiveItems() {
+                                    const startIndex = (currentPage - 1) * 5;
+                                    const endIndex = startIndex + 5;
 
                                     // Hide all playlist items
                                     playlistItems.forEach(item => {
@@ -316,68 +393,17 @@
                                 // Handle next button click
                                 nextButton.addEventListener("click", () => {
                                     currentPage++;
-                                    showItems();
+                                    showFiveItems();
                                 });
 
                                 // Handle previous button click
                                 prevButton.addEventListener("click", () => {
                                     currentPage--;
-                                    showItems();
+                                    showFiveItems();
                                 });
 
                                 // Show initial items
-                                showItems();
-
-                                // populate the addSongForm with the playlistName songs
-                                let addSongButton = document.getElementById("addSongButton");
-                                let addSongFormSelection = document.getElementById("addSongFormSelectionId");
-                                let addSongForm = addSongButton.closest("form");
-
-                                // clear all the children of class addSongFormSelection
-                                let addSongFormSelectionItems = document.getElementsByClassName("addSongFormSelectionItem");
-                                while (addSongFormSelectionItems[1]) {
-                                    addSongFormSelectionItems[0].parentNode.removeChild(addSongFormSelectionItems[0]);
-                                }
-
-                                // get all the songs from the database
-                                let allSongs = await getAllSongsForCheckboxes();
-
-                                // append all the songs as children of the div using foreach
-                                // Loop through the playlistSongs array
-                                allSongs.forEach(song => {
-                                    let songOption = document.createElement("option");
-                                    songOption.classList.add("addSongFormSelectionItem");
-                                    songOption.innerText = song;
-                                    songOption.value = song;
-                                    addSongFormSelection.appendChild(songOption);
-                                });
-
-                                addSongButton.addEventListener('click', (e) => {
-                                    e.preventDefault();
-                                    if (addSongForm.checkValidity()) {
-
-                                        let playlistNameInAddSongForm = document.getElementById("playlistNameInAddSongFormId");
-                                        playlistNameInAddSongForm.value = playlistName;
-
-                                        makeCall("POST", "AddSong", addSongForm, request => {
-                                            // check the response status
-                                            if (request.readyState == XMLHttpRequest.DONE) {
-                                                // if the response status is 200 ok
-                                                switch (request.status) {
-                                                    case 200:
-                                                        getSongsInPlaylist(playlistName);
-                                                        break;
-                                                    default:
-                                                        // if the response status is other
-                                                        // print the error
-                                                        console.log("error");
-                                                        break;
-
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
+                                showFiveItems();
 
                             })
                             .catch(() => {
@@ -397,49 +423,41 @@
     }
 
 
-    let getAllSongsForCheckboxes = async function () {
-        return new Promise((resolve, reject) => {
-            // make a call to the servlet called GetSongList to get all the songs of the logged user to create checkboxes
-            makeCall("GET", "GetSongList", null, request => {
-                // check the response status
-                if (request.readyState == XMLHttpRequest.DONE) {
-                    // if the response status is 200 ok
-                    switch (request.status) {
-                        case 200:
-                            let userSongs = JSON.parse(request.responseText); // this is a list of strings
+    let showCreatePlaylistForm = function () {
+        // make a call to the servlet called GetSongList to get all the songs of the logged user to create checkboxes
+        makeCall("GET", "GetSongList", null, request => {
+            // check the response status
+            if (request.readyState == XMLHttpRequest.DONE) {
+                // if the response status is 200 ok
+                switch (request.status) {
+                    case 200:
+                        let userSongs = JSON.parse(request.responseText); // this is a list of strings
 
-                            // find the div with id playlists
-                            let createPlaylistForm = document.getElementById("SongsForm");
+                        // find the div with id playlists
+                        let createPlaylistForm = document.getElementById("SongsForm");
 
-                            // clear all the children of class playlistItem
-                            let songCheckboxes = document.getElementsByClassName("song");
-                            while (songCheckboxes[0]) {
-                                songCheckboxes[0].parentNode.removeChild(songCheckboxes[0]);
-                            }
+                        // clear all the children of class playlistItem
+                        let songCheckboxes = document.getElementsByClassName("song");
+                        while (songCheckboxes[0]) {
+                            songCheckboxes[0].parentNode.removeChild(songCheckboxes[0]);
+                        }
 
-                            // append all the songs as children of the form using foreach as checkboxes with the name song
-                            userSongs.forEach(song => {
-                                let div = document.createElement("div");
-                                div.classList.add("song");
-                                div.innerHTML = '<input type="checkbox" name="checkbox" value="' + song + '">' + song;
-                                createPlaylistForm.insertBefore(div, document.getElementById("CreatePlaylistButton"));
-                            });
+                        // append all the songs as children of the form using foreach as checkboxes with the name song
+                        userSongs.forEach(song => {
+                            let div = document.createElement("div");
+                            div.classList.add("song");
+                            div.innerHTML = '<input type="checkbox" name="checkbox" value="' + song + '">' + song;
+                            createPlaylistForm.insertBefore(div, document.getElementById("CreatePlaylistButton"));
+                        });
+                        break;
+                    default:
+                        // if the response status is other
+                        // print the error
+                        console.log("error");
+                        break;
 
-                            // Resolve the promise
-                            resolve(userSongs);
-
-                            break;
-                        default:
-                            // if the response status is other
-                            // print the error
-                            console.log("error");
-                            // Reject the promise
-                            reject();
-                            break;
-
-                    }
                 }
-            });
+            }
         });
     }
 
@@ -506,8 +524,8 @@
         window.location.href = "index.html";
     }
 
-    getPlaylists();
-    getAllSongsForCheckboxes();
+    showPlaylistsList();
+    showCreatePlaylistForm();
 
     // find the span with the id user
     let userDiv = document.getElementById("user");
@@ -527,7 +545,7 @@
                     // if the response status is 200 ok
                     switch (request.status) {
                         case 200:
-                            getPlaylists();
+                            showPlaylistsList();
                             break;
                         default:
                             // if the response status is other
@@ -553,7 +571,7 @@
                     // if the response status is 200 ok
                     switch (request.status) {
                         case 200:
-                            getAllSongsForCheckboxes();
+                            showCreatePlaylistForm();
                             break;
                         default:
                             // if the response status is other
