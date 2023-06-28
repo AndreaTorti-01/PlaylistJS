@@ -37,24 +37,22 @@ public class GetPlaylistList extends HttpServlet {
 
         //Take the user from the session
         User user = (User) request.getSession().getAttribute("user");
-        List<String> playlists;
+        List<String> playlists = null;
 
         PlaylistDAO pDao = new PlaylistDAO(connection);
 
         try {
             playlists = pDao.getPlaylistsOf(user.getUsername());
         } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);//Code 500
-            response.getWriter().println("Internal server error, retry later");
-            return;
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover playlists");
         }
-
-        response.setStatus(HttpServletResponse.SC_OK);//Code 200
-
+        
         //Create the jSon with the answer
         Gson gSon = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
         String jSon = gSon.toJson(playlists);
 
+        response.setStatus(HttpServletResponse.SC_OK);// Code 200
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jSon);

@@ -44,7 +44,7 @@ public class AlterSongOrder extends HttpServlet {
         String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
 
         if (playlistName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No name given");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No name given");
             return;
         }
 
@@ -53,7 +53,7 @@ public class AlterSongOrder extends HttpServlet {
         JsonArray jsonArray = new Gson().fromJson(reader, JsonArray.class);
 
         if (jsonArray == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No JSON data");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No JSON data");
             return;
         }
 
@@ -71,7 +71,7 @@ public class AlterSongOrder extends HttpServlet {
             playlistDAO.alterSongOrderJS(user.getUsername(), playlistName, newOrder);
         } catch (SQLException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to alter song order");
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         // SENDING 200 IS OPTIONAL, HERE I'M NOT SENDING ANYTHING

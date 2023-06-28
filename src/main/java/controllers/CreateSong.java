@@ -102,7 +102,7 @@ public class CreateSong extends HttpServlet {
         // check if the songs already exists
         try {
             if (songDAO.doesSongExist(title, owner)) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Song already exists");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Song already exists");
                 return;
             }
         } catch (SQLException e1) {
@@ -111,7 +111,7 @@ public class CreateSong extends HttpServlet {
 
         // check if the parameters are bad
         if (title.isEmpty() || author.isEmpty() || album.isEmpty() || genre.isEmpty() || albumYear > currentYear) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to upload song");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or incorrect parameters");
             return;
         }
 
@@ -120,6 +120,7 @@ public class CreateSong extends HttpServlet {
             Files.copy(fileContent, imageFilePath);
         } catch (IOException e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to upload the image");
         }
 
         // upload the song to filePath in its original format
@@ -127,6 +128,7 @@ public class CreateSong extends HttpServlet {
             Files.copy(fileContent, Paths.get(filePath));
         } catch (IOException e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to upload the song");
         }
 
         // upload the other song data
@@ -134,10 +136,12 @@ public class CreateSong extends HttpServlet {
             songDAO.uploadData(title, owner, author, album, genre, albumYear);
         } catch (SQLException e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to upload the song data");
         }
 
         // send ok response with empty body
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("text/plain");
         response.getWriter().println();
     }
 

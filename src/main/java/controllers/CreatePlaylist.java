@@ -47,7 +47,7 @@ public class CreatePlaylist extends HttpServlet {
         String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
 
         if (playlistName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No name given");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No name given");
             return;
         }
 
@@ -72,6 +72,7 @@ public class CreatePlaylist extends HttpServlet {
                 playlistDAO.createPlaylist(user.getUsername(), selectedSongs, playlistName, albumYears, currentTime);
             } catch (SQLException e) {
                 e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error in creating playlist");
             }
 
             // send ok response with empty body
@@ -80,7 +81,7 @@ public class CreatePlaylist extends HttpServlet {
             response.getWriter().println();
 
         } else {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No songs selected");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No songs selected");
         }
     }
 

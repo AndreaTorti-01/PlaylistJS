@@ -39,16 +39,17 @@ public class GetSongDetailsAsJson extends HttpServlet {
         String songName = StringEscapeUtils.escapeJava(request.getParameter("songName"));
 
         if (songName == null || songName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No song name given");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing song name");
             return;
         }
 
         // get the song details from the database and send them as json
-        Song song;
+        Song song = null;
         try {
             song = songDAO.getSongDetails(user.getUsername(), songName);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to get song details");
         }
 
         response.setStatus(HttpServletResponse.SC_OK);

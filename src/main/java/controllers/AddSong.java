@@ -46,7 +46,7 @@ public class AddSong extends HttpServlet {
         String newSong = StringEscapeUtils.escapeJava(request.getParameter("newSong"));
 
         if (playlistName.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No name given");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No name given");
             return;
         }
 
@@ -78,13 +78,15 @@ public class AddSong extends HttpServlet {
 
             } catch (SQLException e) {
                 e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error creating playlist");
             }
         } else if (!newSong.isEmpty()) {
-            int albumYear;
+            int albumYear = 1000;
             try {
                 albumYear = songDAO.getSongDetails(user.getUsername(), newSong).getAlbumYear();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error getting song details");
             }
 
             // add to the playlist if not already present
@@ -93,6 +95,7 @@ public class AddSong extends HttpServlet {
                     playlistDAO.addSong(user.getUsername(), playlistName, newSong, albumYear);
             } catch (SQLException e) {
                 e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error adding song to playlist");
             }
 
             // send ok with empty body
@@ -102,7 +105,7 @@ public class AddSong extends HttpServlet {
 
         } else {
             // no songs selected
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No songs selected");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No songs selected");
         }
     }
 

@@ -40,6 +40,7 @@ public class GetSongList extends HttpServlet {
             userSongs = songDAO.getSongsOf(user.getUsername());
         } catch (SQLException e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover songs");
         }
 
         Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();

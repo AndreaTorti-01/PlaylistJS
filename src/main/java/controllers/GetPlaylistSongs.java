@@ -36,11 +36,13 @@ public class GetPlaylistSongs extends HttpServlet {
 
         User user = (User) request.getSession().getAttribute("user");
         String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
+
         List<String> playlistSongs = null;
         try {
             playlistSongs = playlistDAO.getSongsOfPlaylistOf(user.getUsername(), playlistName);
         } catch (SQLException e) {
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to recover songs");
         }
 
         Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
