@@ -4,6 +4,7 @@ import beans.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import dao.PlaylistDAO;
+import org.apache.commons.lang.StringEscapeUtils;
 import utils.ConnectionHandler;
 
 import javax.servlet.ServletException;
@@ -40,7 +41,7 @@ public class AlterSongOrder extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
 
         // playlist name is a request parameter
-        String playlistName = request.getParameter("playlistName");
+        String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
 
         // Retrieve JSON data from request's input stream
         BufferedReader reader = request.getReader();

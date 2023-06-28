@@ -41,7 +41,7 @@ public class AddSong extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
 
         // get the playlist name from the request url parameter called id
-        String playlistName = StringEscapeUtils.escapeJava(request.getParameter("id"));
+        String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
         // get the selected song as the newSong request parameter
         String newSong = StringEscapeUtils.escapeJava(request.getParameter("newSong"));
 

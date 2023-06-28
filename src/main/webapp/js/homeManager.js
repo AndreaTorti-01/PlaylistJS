@@ -254,11 +254,7 @@
                         addSongButton.addEventListener('click', (e) => {
                             e.preventDefault();
                             if (addSongForm.checkValidity()) {
-
-                                let playlistNameInAddSongForm = document.getElementById("playlistNameInAddSongFormId");
-                                playlistNameInAddSongForm.value = playlistName;
-
-                                makeCall("POST", "AddSong", addSongForm, request => {
+                                makeCall("POST", "AddSong?playlistName=" + playlistName, addSongForm, request => {
                                     // check the response status
                                     if (request.readyState == XMLHttpRequest.DONE) {
                                         // if the response status is 200 ok

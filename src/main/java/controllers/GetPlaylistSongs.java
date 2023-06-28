@@ -4,6 +4,7 @@ import beans.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dao.PlaylistDAO;
+import org.apache.commons.lang.StringEscapeUtils;
 import utils.ConnectionHandler;
 
 import javax.servlet.ServletException;
@@ -34,7 +35,7 @@ public class GetPlaylistSongs extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         User user = (User) request.getSession().getAttribute("user");
-        String playlistName = request.getParameter("playlistName");
+        String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
         List<String> playlistSongs = null;
         try {
             playlistSongs = playlistDAO.getSongsOfPlaylistOf(user.getUsername(), playlistName);

@@ -76,6 +76,7 @@ public class CreatePlaylist extends HttpServlet {
 
             // send ok response with empty body
             response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("text/plain");
             response.getWriter().println();
 
         } else {

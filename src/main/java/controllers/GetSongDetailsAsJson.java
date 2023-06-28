@@ -4,6 +4,7 @@ import beans.Song;
 import beans.User;
 import com.google.gson.Gson;
 import dao.SongDAO;
+import org.apache.commons.lang.StringEscapeUtils;
 import utils.ConnectionHandler;
 
 import javax.servlet.ServletException;
@@ -34,7 +35,7 @@ public class GetSongDetailsAsJson extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
 
         // get the song name from the post request
-        String songName = request.getParameter("songName");
+        String songName = StringEscapeUtils.escapeJava(request.getParameter("songName"));
 
         if (songName == null || songName.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
