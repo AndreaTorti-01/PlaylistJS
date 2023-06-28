@@ -43,9 +43,19 @@ public class AlterSongOrder extends HttpServlet {
         // playlist name is a request parameter
         String playlistName = StringEscapeUtils.escapeJava(request.getParameter("playlistName"));
 
+        if (playlistName.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No name given");
+            return;
+        }
+
         // Retrieve JSON data from request's input stream
         BufferedReader reader = request.getReader();
         JsonArray jsonArray = new Gson().fromJson(reader, JsonArray.class);
+
+        if (jsonArray == null) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No JSON data");
+            return;
+        }
 
         // Create a list of song names from the JSON array
         int size = jsonArray.size();
@@ -60,10 +70,11 @@ public class AlterSongOrder extends HttpServlet {
         try {
             playlistDAO.alterSongOrderJS(user.getUsername(), playlistName, newOrder);
         } catch (SQLException e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Not possible to alter song order");
             throw new RuntimeException(e);
         }
 
-
+        // SENDING 200 IS OPTIONAL, HERE I'M NOT SENDING ANYTHING
     }
 
     public void destroy() {

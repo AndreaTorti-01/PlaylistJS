@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -30,7 +31,7 @@ public class GetSongDetailsAsJson extends HttpServlet {
     }
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // if the user is logged in correctly then set the user attribute
         User user = (User) request.getSession().getAttribute("user");
 
@@ -38,13 +39,7 @@ public class GetSongDetailsAsJson extends HttpServlet {
         String songName = StringEscapeUtils.escapeJava(request.getParameter("songName"));
 
         if (songName == null || songName.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().println("Missing song name");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No song name given");
             return;
         }
 
@@ -64,10 +59,6 @@ public class GetSongDetailsAsJson extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        try {
-            response.getWriter().println(json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        response.getWriter().write(json);
     }
 }
