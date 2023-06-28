@@ -127,14 +127,32 @@
     let showReorderPage = function (playlistName) {
 
         let hideButton = document.getElementById("backButton");
+        hideButton.innerText = "salva ordinamento";
         hideButton.addEventListener('click', () => {
-            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
-            document.getElementById("playlistColumn").classList.remove("hidden");
-            document.getElementById("PlaylistPageId").classList.add("hidden");
-
+            let newOrder = [];
             document.getElementById("PlaylistPageId").querySelectorAll(".playlistItem").forEach(item => {
-                console.log(item.innerText);
+                newOrder.push(item.innerText);
             });
+            makeCall("POST", "AlterSongOrder?playlistName=" + playlistName, null, request => {
+                // check the response status
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    // if the response status is 200 ok
+                    switch (request.status) {
+                        case 200:
+                            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
+                            document.getElementById("playlistColumn").classList.remove("hidden");
+                            document.getElementById("PlaylistPageId").classList.add("hidden");
+                            break;
+                        default:
+                            // if the response status is other
+                            // print the error
+                            console.log("error");
+                            break;
+
+                    }
+
+                }
+            }, newOrder);
         });
 
         // hide the prevButton and nextButton
@@ -196,6 +214,7 @@
     let showPlaylistPage = function (playlistName) {
 
         let hideButton = document.getElementById("backButton");
+        hideButton.innerText = "indietro";
         hideButton.addEventListener('click', () => {
             // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
             document.getElementById("playlistColumn").classList.remove("hidden");
@@ -311,34 +330,6 @@
                                         switch (request.status) {
                                             case 200:
                                                 let songDetails = JSON.parse(request.responseText); // this is a list of strings
-
-                                                /*
-
-                                                // get userName from session
-                                                let username = sessionStorage.getItem("user");
-                                                let songBox = document.createElement("div");
-                                                songBox.classList.add("playlistItem");
-
-                                                // display the cover using getAlbumCover to get the image
-                                                let coverDom = document.createElement("img");
-                                                coverDom.src = "cover/" + username + "/" + songDetails["albumName"] + ".jpg";
-                                                coverDom.classList.add("albumCover");
-                                                songBox.appendChild(coverDom);
-
-                                                // display the song name
-                                                let songDom = document.createElement("div");
-                                                songDom.innerText = song;
-                                                songBox.appendChild(songDom);
-
-                                                // append songBox to songsParent before button of id "nextButton"
-                                                songsParent.insertBefore(songBox, document.getElementById("nextButton"));
-
-                                                // add a listener to the div to make it clickable
-                                                songDom.addEventListener('click', function () {
-                                                    showPlayer(song)
-                                                });
-
-                                                */
 
                                                 // Resolve the promise
                                                 resolve(songDetails);

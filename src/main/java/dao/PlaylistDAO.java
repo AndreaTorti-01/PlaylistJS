@@ -33,8 +33,6 @@ public class PlaylistDAO {
                 preparedStatement.setInt(6, i);
 
                 preparedStatement.executeUpdate();
-
-                connection.commit();
             }
 
         } catch (SQLException e) {
@@ -182,8 +180,6 @@ public class PlaylistDAO {
                 preparedStatement.setString(4, songs.get(i));
 
                 preparedStatement.executeUpdate();
-
-                connection.commit();
             }
         } catch (SQLException e) {
             connection.rollback(); // transaction block abort
