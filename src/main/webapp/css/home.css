@@ -127,6 +127,10 @@ form {
     box-shadow: 0px 0px 10px 2px #586e75;
 }
 
+form#SongsForm {
+    gap: 0.3em;
+}
+
 .hidden {
     display: none;
 }
