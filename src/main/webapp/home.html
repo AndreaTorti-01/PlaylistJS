@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Playlist App</title>
-    <link href="css/app.css" media="all" rel="stylesheet" type="text/css"/>
+    <link href="css/home.css" media="all" rel="stylesheet" type="text/css"/>
     <link href="favicon.ico" rel="icon" type="image/x-icon"/>
     <script charset="utf-8" defer src="js/utils.js"></script>
-    <script charset="utf-8" defer src="js/homeManager.js"></script>
-
+    <script charset="utf-8" defer src="js/home.js"></script>
 </head>
 <body>
 
@@ -23,11 +22,6 @@
 
     <form action="#">
         <div class="formPrompt">Use this form to upload a new song</div>
-        <div class="horDivBox">
-            <div class="smolText">Upload the song audio file:</div>
-            <input accept="audio/mpeg" id="songFile" name="songFile" required type="file">
-        </div>
-
         <select name="genre" required>
             <option disabled selected value="">Select Genre</option>
             <option value="rock">Rock</option>
@@ -38,10 +32,18 @@
         <input id="author" name="author" placeholder="Author Name" required type="text">
         <input id="album" name="album" placeholder="Album Title" required type="text">
         <input id="albumYear" min="1000" name="albumYear" placeholder="Publication Year" required type="number">
-        <div class="horDivBox">
+
+        <div class="fileSelectionBox">
+            <div class="smolText">Upload the song audio file:</div>
+            <input accept="audio/mpeg" id="songFile" name="songFile" required type="file">
+        </div>
+
+
+        <div class="fileSelectionBox">
             <div class="smolText">Upload the album cover image:</div>
             <input accept="image/*" id="imageFile" name="imageFile" required type="file">
         </div>
+
         <input id="uploadSongButton" type="submit" value="Upload!">
     </form>
 

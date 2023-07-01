@@ -102,25 +102,6 @@ public class PlaylistDAO {
         return ret;
     }
 
-    public List<String> getFiveSongsAtMost(String playlistOwner, String playlistName, int offset) throws SQLException {
-        String query = "SELECT playlistSong, albumYear FROM playlist WHERE playlistOwner = ? AND playlistName = ? ORDER BY albumYear DESC LIMIT 5 OFFSET ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-        preparedStatement.setString(1, playlistOwner);
-        preparedStatement.setString(2, playlistName);
-        preparedStatement.setInt(3, offset);
-
-        ResultSet res = preparedStatement.executeQuery();
-        List<String> ret = new ArrayList<>();
-        String name;
-
-        while (res.next()) {
-            name = res.getString("playlistSong");
-            ret.add(name);
-        }
-        return ret;
-    }
-
     public int getPlaylistNextFreeIndex(String playlistOwner, String playlistName) throws SQLException {
         String query = "SELECT MAX(songIndexJs) FROM playlist WHERE playlistOwner = ? AND playlistName = ?";
         PreparedStatement preparedStatement = connection.prepareStatement(query);

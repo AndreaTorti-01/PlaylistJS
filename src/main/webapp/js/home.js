@@ -77,11 +77,9 @@
                             // create a div to contain the playlistListItem and the reorderButton, so that they can be displayed on the same line
                             let playlistContainerDiv = document.createElement("div");
                             playlistContainerDiv.classList.add("playlistListItem");
-                            playlistContainerDiv.style.display = "flex";
-                            playlistContainerDiv.style.gap = "1em";
 
-                            playlistContainerDiv.appendChild(playlistListItem);
                             playlistContainerDiv.appendChild(ReorderButton);
+                            playlistContainerDiv.appendChild(playlistListItem);
 
                             playlists.appendChild(playlistContainerDiv);
 
