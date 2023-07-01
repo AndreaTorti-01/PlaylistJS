@@ -80,6 +80,7 @@ input:focus {
 
 input[type="submit"] {
     background-color: #2aa198;
+    border: none;
     cursor: pointer;
 }
 
