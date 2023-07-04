@@ -164,7 +164,7 @@ public class PlaylistDAO {
             }
         } catch (SQLException e) {
             connection.rollback(); // transaction block abort
-            System.out.println("Errore nell'aggiornamento dell'ordine delle canzoni");
+            System.out.println("Error while updating the order of the songs in the playlist");
         } finally {
             connection.setAutoCommit(true); // transaction block end
             if (preparedStatement != null)
