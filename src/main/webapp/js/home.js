@@ -45,6 +45,7 @@
 
         // get all elements of class playlistListItem and remove them
         let playlistListItems = document.getElementsByClassName("playlistListItem");
+        // keep removing elements until the list is empty
         while (playlistListItems[0]) {
             playlistListItems[0].parentNode.removeChild(playlistListItems[0]);
         }
@@ -56,6 +57,7 @@
                 // if the response status is 200 ok
                 switch (request.status) {
                     case 200:
+                        // parse the json result taken from the servlet to a list of strings
                         let userPlaylists = JSON.parse(request.responseText); // this is a list of strings
 
                         // find the div with id playlists
@@ -69,7 +71,7 @@
                             playlistListItem.classList.add("playlistListItemButton");
                             playlistListItem.innerText = playlistName;
 
-                            // create the reorderButton
+                            // create the reorderButton to reorder the songs of the playlist next to all the playlist names
                             let ReorderButton = document.createElement("button");
                             ReorderButton.classList.add("reorderButton");
                             ReorderButton.innerText = "Reorder songs";
@@ -78,20 +80,22 @@
                             let playlistContainerDiv = document.createElement("div");
                             playlistContainerDiv.classList.add("playlistListItem");
 
+                            // append the reorder button and the playlistListItem to the div
                             playlistContainerDiv.appendChild(ReorderButton);
                             playlistContainerDiv.appendChild(playlistListItem);
-
+                            // append playlistContainerDiv to the playlists div
                             playlists.appendChild(playlistContainerDiv);
 
                             ReorderButton.addEventListener('click', () => {
                                 // get the name of the playlist
                                 //let playlistName = e.target.innerText;
 
-                                // make a call to the servlet called GetPlaylistSongs to get all the songs of the playlist
+                                // make a call to the servlet called GetPlaylistSongs to get all the songs of the playlist showing only the titles
                                 showReorderPage(playlistName);
                                 //handleSorting.addEventListeners();
                                 // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                                 document.getElementById("playlistColumn").classList.add("hidden");
+                                // show the AddSongForm
                                 document.getElementById("PlaylistPageId").classList.remove("hidden");
                             });
 
@@ -104,6 +108,7 @@
                                 showPlaylistPage(playlistName);
                                 // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                                 document.getElementById("playlistColumn").classList.add("hidden");
+                                //
                                 document.getElementById("PlaylistPageId").classList.remove("hidden");
                             });
                         });
@@ -124,9 +129,9 @@
     // funzione che prende i nomi delle canzoni della playlist mostrando solo i titoli
     let showReorderPage = function (playlistName) {
 
-        let hideButton = document.getElementById("backButton");
-        hideButton.innerText = "salva ordinamento";
-        hideButton.addEventListener('click', () => {
+        let saveButton = document.getElementById("saveButton");
+        saveButton.classList.remove("hidden");
+        saveButton.addEventListener('click', () => {
             let newOrder = [];
             document.getElementById("PlaylistPageId").querySelectorAll(".playlistItem").forEach(item => {
                 newOrder.push(item.innerText);
@@ -140,6 +145,7 @@
                             // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
                             document.getElementById("playlistColumn").classList.remove("hidden");
                             document.getElementById("PlaylistPageId").classList.add("hidden");
+                            document.getElementById("saveButton").classList.add("hidden");
                             break;
                         default:
                             // if the response status is other
@@ -152,6 +158,16 @@
                 }
             }, newOrder);
         });
+
+
+        let backButton = document.getElementById("backButton");
+        backButton.addEventListener('click', () => {
+            // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
+            document.getElementById("playlistColumn").classList.remove("hidden");
+            document.getElementById("PlaylistPageId").classList.add("hidden");
+            document.getElementById("saveButton").classList.add("hidden");
+        });
+
 
         // hide the prevButton and nextButton
         document.getElementById("prevButton").classList.add("hidden");
@@ -212,7 +228,6 @@
     let showPlaylistPage = function (playlistName) {
 
         let hideButton = document.getElementById("backButton");
-        hideButton.innerText = "indietro";
         hideButton.addEventListener('click', () => {
             // hide the playlistColumn div and show the PlaylistPageId div using the hidden class
             document.getElementById("playlistColumn").classList.remove("hidden");
@@ -221,66 +236,97 @@
 
         // clear all the children of class addSongFormSelection
         let addSongFormSelectionItems = document.getElementsByClassName("addSongFormSelectionItem");
-        while (addSongFormSelectionItems[1]) {
+        while (addSongFormSelectionItems[0]) {
             addSongFormSelectionItems[0].parentNode.removeChild(addSongFormSelectionItems[0]);
         }
 
-        // get all the songs
-        makeCall("GET", "GetSongList", null, request => {
-            // check the response status
-            if (request.readyState == XMLHttpRequest.DONE) {
-                // if the response status is 200 ok
-                switch (request.status) {
-                    case 200:
-                        let allSongs = JSON.parse(request.responseText); // this is a list of strings
 
-                        // populate the addSongForm with all the songs
-                        let addSongButton = document.getElementById("addSongButton");
-                        let addSongFormSelection = document.getElementById("addSongFormSelectionId");
-                        let addSongForm = addSongButton.closest("form");
+        // create a promise for the asynchronous call
+        let promise = new Promise((resolve, reject) => {
+            makeCall("GET", "GetPlaylistSongs?playlistName=" + playlistName, null, request => {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    // if the response status is 200 ok
+                    switch (request.status) {
+                        case 200:
+                            let songArray = JSON.parse(request.responseText); // this is a list of strings
 
-                        // append all the songs as children of the form select using foreach
-                        allSongs.forEach(song => {
-                            let songOption = document.createElement("option");
-                            songOption.classList.add("addSongFormSelectionItem");
-                            songOption.innerText = song;
-                            songOption.value = song;
-                            addSongFormSelection.appendChild(songOption);
-                        });
-
-                        // add a listener to the addSongButton
-                        addSongButton.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            if (addSongForm.checkValidity()) {
-                                makeCall("POST", "AddSong?playlistName=" + playlistName, addSongForm, request => {
-                                    // check the response status
-                                    if (request.readyState == XMLHttpRequest.DONE) {
-                                        // if the response status is 200 ok
-                                        switch (request.status) {
-                                            case 200:
-                                                showPlaylistPage(playlistName);
-                                                break;
-                                            default:
-                                                // if the response status is other
-                                                // print the error
-                                                console.log("error");
-                                                break;
-
-                                        }
-                                    }
-                                });
-                            }
-                        });
-
-                        break;
-                    default:
-                        // if the response status is other
-                        // print the error
-                        console.log("error");
-                        break;
-
+                            // Resolve the promise
+                            resolve(songArray);
+                            break;
+                        default:
+                            // if the response status is other
+                            // print the error
+                            console.log("error");
+                            reject();
+                            break;
+                    }
                 }
-            }
+            });
+        });
+
+        // Wait for the promise to be resolved
+        promise.then((songsAlreadyInPlaylist) => {
+            // get all the songs
+            makeCall("GET", "GetSongList", null, request => {
+                // check the response status
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    // if the response status is 200 ok
+                    switch (request.status) {
+                        case 200:
+                            let allSongs = JSON.parse(request.responseText); // this is a list of strings
+
+                            // populate the addSongForm with all the songs
+                            let addSongButton = document.getElementById("addSongButton");
+                            let addSongFormSelection = document.getElementById("addSongFormSelectionId");
+                            let addSongForm = addSongButton.closest("form");
+
+                            // append all the songs as children of the form select using foreach
+                            allSongs.forEach(song => {
+                                let songOption = document.createElement("option");
+                                songOption.classList.add("addSongFormSelectionItem");
+                                songOption.innerText = song;
+                                songOption.value = song;
+                                addSongFormSelection.appendChild(songOption);
+                                if (songsAlreadyInPlaylist.includes(song)) {
+                                    songOption.disabled = true;
+                                }
+                            });
+
+
+                            // add a listener to the addSongButton
+                            addSongButton.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                if (addSongForm.checkValidity()) {
+                                    makeCall("POST", "AddSong?playlistName=" + playlistName, addSongForm, request => {
+                                        // check the response status
+                                        if (request.readyState == XMLHttpRequest.DONE) {
+                                            // if the response status is 200 ok
+                                            switch (request.status) {
+                                                case 200:
+                                                    showPlaylistPage(playlistName);
+                                                    break;
+                                                default:
+                                                    // if the response status is other
+                                                    // print the error
+                                                    console.log("error");
+                                                    break;
+
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+
+                            break;
+                        default:
+                            // if the response status is other
+                            // print the error
+                            console.log("error");
+                            break;
+
+                    }
+                }
+            });
         });
 
 

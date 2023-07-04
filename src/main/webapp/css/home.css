@@ -261,18 +261,15 @@ button {
     border: none;
     padding: 0.7em;
     cursor: pointer;
-    cursor: pointer;
     border-radius: 0.2em;
 }
 
 #nextButton {
-    background: #859900;
-    color: white;
+    background: #6c71c4;
 }
 
 #prevButton {
     background: #6c71c4;
-    color: white;
 }
 
 .reorderButton {
@@ -317,3 +314,4 @@ input[type="number"] {
     appearance: textfield;
     -moz-appearance: textfield;
 }
+
